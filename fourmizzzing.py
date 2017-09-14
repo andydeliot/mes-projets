@@ -194,7 +194,7 @@ class Fourmilliere:
         h2 = self.browser.find("h2", text=amelioration)
         tr = h2.parent.parent
         div = tr.find("div", {"class":"ouvriere"})
-        ouvrieres_necessaire = int(div.text)
+        ouvrieres_necessaire = int(div.text.replace(" ", ""))
 
         if self.ouvrieres - ouvrieres_necessaire < self.tdc and ouvrieres_necessaire > 0:
             return False
