@@ -127,8 +127,8 @@ class Fourmilliere:
 
         self.get_ressource()
 
-        ouvrieres = self.tdc if self.tdc <= self.ouvrieres else self.ouvrieres
-        nourriture = self.production if self.production <= ouvrieres else ouvrieres
+        ouvrieres = self.tdc if self.tdc < self.ouvrieres else self.ouvrieres
+        nourriture = self.production if self.production < ouvrieres else ouvrieres
         materiaux = ouvrieres - nourriture
         
         form = self.browser.get_form(action="Ressources.php")
@@ -239,10 +239,11 @@ class Fourmilliere:
             print("0 !")
             self.get_ressource()
             print(str(self) + "------ " + str(nbr_boucle))
+            # Début.
+            self.production = 100
             # Chasse.
             if self.chasser():
                 # Ponte.
-                self.production = 100
                 self.pondre("ouvriere", 0.3)
                 self.pondre("unite1", 0.2)
                 self.pondre("unite4", 0.5)
