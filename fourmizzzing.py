@@ -40,7 +40,11 @@ def dormir(temps):
 class Fourmilliere:
     nourriture_unite = {"ouvriere":5,
                         "unite1":16,
-                        "unite2":20}
+                        "unite2":20,
+                        "unite3":26,
+                        "unite4":30,
+                        "unite5":36,
+                        "unite6":70,}
     def __init__(self):
         self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0")
         self.connexion()
@@ -186,6 +190,8 @@ class Fourmilliere:
         form = self.browser.get_form(action="Reine.php")
         form["typeUnite"] = type_unite
         form["nombre_de_ponte"] = nombre
+        if type_unite != "ouvriere":
+            form["destination"] = "1" # Equivaut au terrain de chasse.
 
         self.browser.submit_form(form)
 
