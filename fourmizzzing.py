@@ -81,13 +81,13 @@ class Fourmilliere:
         self.page("Armée")
 
         total = 0
-        for unite in ["Jeune Soldate Naine",
-                      "Soldate Naine",
-                      "Naine d’Elite"]:
+        for unite in ["Jeune Soldate",
+                      "Soldate",
+                      "Soldate d’élite"]:
             titre = self.browser.find("div", text=unite)
             p = titre.parent.parent
             for u in p.findAll("span"):
-                total += int(u.text)
+                total += int(u.text.replace(" ", ""))
 
         self.armee = total
 
@@ -146,9 +146,19 @@ class Fourmilliere:
         self.browser.submit_form(form)
 
         form = self.browser.get_form(action="AcquerirTerrain.php")
+        try: form["unite1"] = 0
+        except: pass
+        try: form["unite2"] = 0
+        except: pass
+        try: form["unite3"] = 0
+        except: pass
+        if form["unite4"] == 0:
+            return False
         self.browser.submit_form(form)
 
         self.get_temps_chasse()
+
+        return True
 
     def pondre(self, type_unite, pourcent):
         """ Permet de faire pondre la reine. Le pourcent correspond au temps de chasse. """
@@ -224,23 +234,25 @@ class Fourmilliere:
             self.get_ressource()
             print(str(self) + "------ " + str(nbr_boucle))
             # Chasse.
-            self.chasser()
-            # Ponte.
-##            self.production = 100
-##            self.pondre("ouvriere", 0.7)
-##            self.pondre("unite2", 0.3)
-##            # Travail. 
-##            self.faire_travailler()
+            if self.chasser():
+                # Ponte.
+                self.production = 100
+                self.pondre("ouvriere", 0.3)
+                self.pondre("unite1", 0.2)
+                self.pondre("unite4", 0.5)
+                # Travail. 
+                self.faire_travailler()
             # Construction et amélioration.
+            self.construire("Laboratoire")
             self.rechercher("Armes")
             self.rechercher("Bouclier Thoracique")
             self.rechercher("Vitesse de chasse")
+            self.rechercher("Technique de ponte")
             self.construire("Couveuse")
             self.construire("Solarium")
-            self.rechercher("Technique de ponte")
-            self.construire("Laboratoire")
             self.construire("Entrepôt de Matériaux")
             self.rechercher("Architecture")
+            self.rechercher("Vitesse d'attaque")
 
             nbr_boucle += 1
 
