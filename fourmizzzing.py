@@ -12,11 +12,17 @@ def parser_temps(texte_temps):
     heures = 0
     for texte in textes:
         if "s" in texte:
-            secondes = int(texte[:-1])
+            texte = texte[:-1]
+            texte = texte.split(".")[0]
+            secondes = int(texte)
         if "m" in texte:
-            minutes = int(texte[:-1])
+            texte = texte[:-1]
+            texte = texte.split(".")[0]
+            minutes = int(texte)
         if "h" in texte:
-            heures = int(texte[:-1])
+            texte = texte[:-1]
+            texte = texte.split(".")[0]
+            heures = int(texte)
     return timedelta(hours=heures, minutes=minutes, seconds=secondes)
 
 def dormir(temps):
@@ -240,8 +246,8 @@ class Fourmilliere:
                 self.pondre("ouvriere", 0.3)
                 self.pondre("unite1", 0.2)
                 self.pondre("unite4", 0.5)
-                # Travail. 
-                self.faire_travailler()
+            # Travail. 
+            self.faire_travailler()
             # Construction et amélioration.
             self.construire("Laboratoire")
             self.rechercher("Armes")
