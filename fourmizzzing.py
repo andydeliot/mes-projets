@@ -3,6 +3,7 @@ import time
 import arrow
 from datetime import timedelta
 from robobrowser import RoboBrowser
+from Lib.Threader import Threader
 
 
 def parser_temps(texte_temps):
@@ -276,7 +277,7 @@ class Fourmilliere:
             nbr_boucle += 1
 
     def __str__(self):
-        text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc)
+        text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc, {4} Jeune Soldates.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc, self.armee["Jeune Soldate"])
         return text
 
 
