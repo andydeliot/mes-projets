@@ -63,7 +63,6 @@ class Fourmilliere:
 
         self.get_ressource()
 
-        self.armee = 0
         self.armee = {}
         self.get_armee()
         
@@ -93,21 +92,6 @@ class Fourmilliere:
         self.nourriture = int(self.browser.find(id="nb_nourriture").text.split(".")[0])
         self.bois = int(self.browser.find(id="nb_materiaux").text)
         self.tdc = int(self.browser.find(id="quantite_tdc").text)
-
-    def get_armee(self):
-        """ Recueil le nombre d'armée totale. """
-        self.page("Armée")
-
-        total = 0
-        for unite in ["Jeune Soldate",
-                      "Soldate",
-                      "Soldate d’élite"]:
-            titre = self.browser.find("div", text=unite)
-            p = titre.parent.parent
-            for u in p.findAll("span"):
-                total += int(u.text.replace(" ", ""))
-
-        self.armee = total
 
     def get_armee(self):
         self.page("Armée")
@@ -161,9 +145,7 @@ class Fourmilliere:
         self.browser.submit_form(form)
 
     def chasser(self, unite):
-        """ Permet de chasser proportionnelement à la taille de l'armée.
-Récupère le temps de chasse.
-Unite représente l'unité qui va chasser."""
+        """ Permet de chasser proportionnelement à la taille de l'unité qui va chasser. """
 
         self.get_armee()
         cm2 = int(self.armee[unite] * 0.03)
