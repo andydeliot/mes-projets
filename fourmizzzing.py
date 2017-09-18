@@ -38,13 +38,20 @@ def dormir(temps):
 
 
 class Fourmilliere:
-    nourriture_unite = {"ouvriere":5,
-                        "unite1":16,
-                        "unite2":20,
-                        "unite3":26,
-                        "unite4":30,
-                        "unite5":36,
-                        "unite6":70,}
+    equivalent = {"Ouvriere":"ouvriere",
+                  "Jeune Soldate Naine":"unite1",
+                  "Soldate Naine":"unite2",
+                  "Naine d'élite":"unite3",
+                  "Jeune Soldate":"unite4",
+                  "Soldate":"unite5",
+                  "Concierge":"unite6",
+                  "Artilleuse":"unite7",
+                  "Artilleuse d'élite":"unite8",
+                  "Soldate d'élite":"unite9",
+                  "Tank":"unite10",
+                  "Tueuse":"unite11",
+                  "Tueuse d'élite":"unite12"}
+
     def __init__(self):
         self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0")
         self.connexion()
@@ -57,6 +64,7 @@ class Fourmilliere:
         self.get_ressource()
 
         self.armee = 0
+        self.armee = {}
         self.get_armee()
         
         self.temps_chasse = timedelta()
@@ -101,6 +109,18 @@ class Fourmilliere:
 
         self.armee = total
 
+    def get_armee(self):
+        self.page("Armée")
+
+        divs = self.browser.find_all("div", {"class":"pas_sur_telephone"})
+        unites = [div.text for div in divs]
+        for unite in unites:
+            titre = self.browser.find("div", text=unite)
+            p = titre.parent.parent
+            self.armee[unite] = 0
+            for nb in p.findAll("span"):
+                self.armee[unite] += int(nb.text.replace(" ", ""))
+
     def get_temps_chasse(self):
         """ Recueil le temps de chasse restant. """
         self.page("Ressources")
@@ -140,10 +160,13 @@ class Fourmilliere:
         form["RecolteMateriaux"] = materiaux
         self.browser.submit_form(form)
 
-    def chasser(self):
-        """ Permet de chasser proportionnelement à la taille de l'armée. Récupère le temps de chasse. """
+    def chasser(self, unite):
+        """ Permet de chasser proportionnelement à la taille de l'armée.
+Récupère le temps de chasse.
+Unite représente l'unité qui va chasser."""
+
         self.get_armee()
-        cm2 = int(self.armee * 0.03)
+        cm2 = int(self.armee[unite] * 0.03)
         if cm2 == 0:
             return False
 
@@ -156,14 +179,14 @@ class Fourmilliere:
         self.browser.submit_form(form)
 
         form = self.browser.get_form(action="AcquerirTerrain.php")
-        try: form["unite1"] = 0
-        except: pass
-        try: form["unite2"] = 0
-        except: pass
-        try: form["unite3"] = 0
-        except: pass
-        if form["unite4"] == 0:
-            return False
+        for cle, item in Fourmilliere.equivalent.items():
+            if cle == unite:
+                if form[item] == 0:
+                    return False
+            else:
+                try: form[item] = 0
+                except: pass
+
         self.browser.submit_form(form)
 
         self.get_temps_chasse()
@@ -179,13 +202,14 @@ class Fourmilliere:
         # Calcul temps.
         input_unite = self.browser.find("input", {"value":type_unite})
         tr = input_unite.parent.parent
-        span = tr.find("span", {"style":"height:20px;width:85px;display:inline-block;"})
-        temps_unite = parser_temps(span.text)
+        spans = tr.findAll("span", {"style":"height:20px;width:85px;display:inline-block;"})
+        temps_unite = parser_temps(spans[0].text)
+        nourriture_unite = spans[1].text.replace(" ", "")
 
         temps_possible = self.temps_chasse * pourcent
         nombre = int(temps_possible / temps_unite)
         quotien = timedelta(minutes=30) / self.temps_chasse
-        self.production += Fourmilliere.nourriture_unite[type_unite] * nombre * quotien
+        self.production += nourriture_unite * nombre * quotien
 
         form = self.browser.get_form(action="Reine.php")
         form["typeUnite"] = type_unite
@@ -246,7 +270,7 @@ class Fourmilliere:
             # Début.
             self.production = 100
             # Chasse.
-            if self.chasser():
+            if self.chasser("Jeune Soldate"):
                 # Ponte.
                 self.pondre("ouvriere", 0.3)
                 self.pondre("unite1", 0.2)
@@ -277,7 +301,7 @@ class Fourmilliere:
 f = Fourmilliere()
 
 if __name__ == "__main__":
-    f.boucle()
+    #f.boucle()
 
     pass
 
