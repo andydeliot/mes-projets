@@ -144,11 +144,11 @@ class Fourmilliere:
         form["RecolteMateriaux"] = materiaux
         self.browser.submit_form(form)
 
-    def chasser(self, unite):
+    def chasser(self, type_unite):
         """ Permet de chasser proportionnelement à la taille de l'unité qui va chasser. """
 
         self.get_armee()
-        cm2 = int(self.armee[unite] * 0.03)
+        cm2 = int(self.armee[type_unite] * 0.03)
         if cm2 == 0:
             return False
 
@@ -162,7 +162,7 @@ class Fourmilliere:
 
         form = self.browser.get_form(action="AcquerirTerrain.php")
         for cle, item in Fourmilliere.equivalent.items():
-            if cle == unite:
+            if cle == type_unite:
                 if form[item] == 0:
                     return False
             else:
@@ -182,16 +182,18 @@ class Fourmilliere:
         self.page("Reine")
 
         # Calcul temps.
+        type_unite = Fourmilliere.equivalent[type_unite]
         input_unite = self.browser.find("input", {"value":type_unite})
         tr = input_unite.parent.parent
         spans = tr.findAll("span", {"style":"height:20px;width:85px;display:inline-block;"})
         temps_unite = parser_temps(spans[0].text)
-        nourriture_unite = spans[1].text.replace(" ", "")
+        nourriture_unite = int(spans[1].text.replace(" ", ""))
 
         temps_possible = self.temps_chasse * pourcent
         nombre = int(temps_possible / temps_unite)
         quotien = timedelta(minutes=30) / self.temps_chasse
-        self.production += nourriture_unite * nombre * quotien
+        print(nourriture_unite, nombre, quotien)
+        self.production += int(nourriture_unite * nombre * quotien)
 
         form = self.browser.get_form(action="Reine.php")
         form["typeUnite"] = type_unite
