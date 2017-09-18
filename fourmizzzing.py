@@ -190,8 +190,6 @@ class Fourmilliere:
         form = self.browser.get_form(action="Reine.php")
         form["typeUnite"] = type_unite
         form["nombre_de_ponte"] = nombre
-        if type_unite != "ouvriere":
-            form["destination"] = "1" # Equivaut au terrain de chasse.
 
         self.browser.submit_form(form)
 
