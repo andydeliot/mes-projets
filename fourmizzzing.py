@@ -273,7 +273,8 @@ class Fourmilliere:
             # Attente.
             print("Il reste : ", end='')
             while self.boucle_chasser:
-                self.get_temps_chasse()
+                with self.verrou:
+                    self.get_temps_chasse()
                 temps_restant = int(self.temps_chasse.seconds / 60)
                 if not temps_restant:
                     print("0 !")
@@ -299,7 +300,6 @@ class Fourmilliere:
         print("chasse fin")
 
     def boucle_amelioration(self):
-        print("ok2")
         while self.boucle_ameliorer:
             # Construction et amélioration.
             with self.verrou:
@@ -315,7 +315,7 @@ class Fourmilliere:
                     self.rechercher("Architecture")
                     self.rechercher("Vitesse d'attaque")
                 except:
-                    pass
+                    print("Erreur amélioration.")
             dormir(60*1)
         print("amelioration fin")
 
