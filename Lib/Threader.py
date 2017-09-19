@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     a.start()
     b.start()
-    
+    input("ok")
     a.join()
     b.join()
 
