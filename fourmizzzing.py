@@ -254,12 +254,6 @@ class Fourmilliere:
 
         chasse.start()
         amelioration.start()
-        #cmd.start()
-
-##        chasse.join()
-##        amelioration.join()
-        #cmd.join()
-
 
     def boucle_cmd(self):
         while True:
