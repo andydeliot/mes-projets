@@ -129,14 +129,17 @@ class Fourmilliere:
     def page(self, nom_page):
         """ Permet d'acceder à une page par son nom. """
         while True:
+            erreur = False
             link = self.browser.get_link(nom_page)
             if link is not None:
-                self.browser.follow_link(link)
-            erreur = self.browser.find("script", text="""alert("Vous venez de vous connecter avec un second navigateur ou quelqu'un vient de se connecter sur votre compte. Il est conseillé de vous reconnecter et de changer votre mot de passe.");""")
-            if erreur is not None:
-                self.connexion()
-            else:
+                try: self.browser.follow_link(link)
+                except ConnectionError: erreur = True
+            alerte = self.browser.find("script", text="""alert("Vous venez de vous connecter avec un second navigateur ou quelqu'un vient de se connecter sur votre compte. Il est conseillé de vous reconnecter et de changer votre mot de passe.");""")
+            if alerte is not None:
+                erreur = True
+            if not erreur:
                 break
+            self.connexion()
 
     def faire_travailler(self):
         """ Fais partager les travailleuses entre les deux ressources possibles. """
@@ -281,7 +284,9 @@ class Fourmilliere:
                     break
                 print(str(temps_restant)+", ", end='')
                 dormir(60)
-            self.get_ressource()
+            with self.verrou:
+                self.get_ressource()
+                self.get_armee()
             print(str(self) + "------ " + str(nbr_boucle))
             # Début.
             self.production = 100
