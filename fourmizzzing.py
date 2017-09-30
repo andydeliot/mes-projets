@@ -3,7 +3,8 @@ import time
 import arrow
 from datetime import timedelta
 from robobrowser import RoboBrowser
-
+from Lib.Threader import Threader
+from threading import RLock
 
 def parser_temps(texte_temps):
     textes = texte_temps.split(" ")
@@ -55,21 +56,29 @@ class Fourmilliere:
     def __init__(self):
         self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0")
         self.connexion()
-        
+
+        # Ressources.
         self.ouvrieres = 0
         self.nourriture = 0
         self.bois = 0
         self.tdc = 0
-
         self.get_ressource()
 
+        # Armées.
         self.armee = {}
         self.get_armee()
-        
+
+        # Chasse.
         self.temps_chasse = timedelta()
         self.get_temps_chasse()
 
+        # Production.
         self.production = 0
+
+        # Thread.
+        self.verrou = RLock()
+        self.boucle_chasser = True
+        self.boucle_ameliorer = True
 
     def connexion(self):
         """ Connexion avec nom d'utilisateur et mdp. """
@@ -120,14 +129,17 @@ class Fourmilliere:
     def page(self, nom_page):
         """ Permet d'acceder à une page par son nom. """
         while True:
+            erreur = False
             link = self.browser.get_link(nom_page)
             if link is not None:
-                self.browser.follow_link(link)
-            erreur = self.browser.find("script", text="""alert("Vous venez de vous connecter avec un second navigateur ou quelqu'un vient de se connecter sur votre compte. Il est conseillé de vous reconnecter et de changer votre mot de passe.");""")
-            if erreur is not None:
-                self.connexion()
-            else:
+                try: self.browser.follow_link(link)
+                except ConnectionError: erreur = True
+            alerte = self.browser.find("script", text="""alert("Vous venez de vous connecter avec un second navigateur ou quelqu'un vient de se connecter sur votre compte. Il est conseillé de vous reconnecter et de changer votre mot de passe.");""")
+            if alerte is not None:
+                erreur = True
+            if not erreur:
                 break
+            self.connexion()
 
     def faire_travailler(self):
         """ Fais partager les travailleuses entre les deux ressources possibles. """
@@ -192,7 +204,6 @@ class Fourmilliere:
         temps_possible = self.temps_chasse * pourcent
         nombre = int(temps_possible / temps_unite)
         quotien = timedelta(minutes=30) / self.temps_chasse
-        print(nourriture_unite, nombre, quotien)
         self.production += int(nourriture_unite * nombre * quotien)
 
         form = self.browser.get_form(action="Reine.php")
@@ -235,48 +246,80 @@ class Fourmilliere:
 
     def boucle(self):
         """ Tourne le programme en boucle. """
-        nbr_boucle = 0
-        print(str(self) + "------ " + str(nbr_boucle))
+        print(self)
+        self.connexion()
+        chasse = Threader(self.boucle_chasse)
+        amelioration = Threader(self.boucle_amelioration)
+        cmd = Threader(self.boucle_cmd)
+
+        chasse.start()
+        amelioration.start()
+
+    def boucle_cmd(self):
         while True:
-            self.connexion()
+            cmd = input(">>> ")
+            if cmd == "stop":
+                self.boucle_chasser = False
+                self.boucle_ameliorer = False
+                break
+        print("commande fin")
+
+    def boucle_chasse(self):
+        nbr_boucle = 0
+        while self.boucle_chasser:
             # Attente.
             print("Il reste : ", end='')
-            while True:
-                self.get_temps_chasse()
-                a = int(self.temps_chasse.seconds / 60)
-                if a == 0:
+            while self.boucle_chasser:
+                with self.verrou:
+                    self.get_temps_chasse()
+                temps_restant = int(self.temps_chasse.seconds / 60)
+                if not temps_restant:
+                    print("0 !")
                     break
-                print(str(a)+", ", end='')
+                print(str(temps_restant)+", ", end='')
                 dormir(60)
-            print("0 !")
-            self.get_ressource()
+            with self.verrou:
+                self.get_ressource()
+                self.get_armee()
             print(str(self) + "------ " + str(nbr_boucle))
             # Début.
             self.production = 100
             # Chasse.
-            if self.chasser("Jeune Soldate"):
-                # Ponte.
-                self.pondre("ouvriere", 0.3)
-                self.pondre("unite1", 0.2)
-                self.pondre("unite4", 0.5)
-            # Travail. 
-            self.faire_travailler()
-            # Construction et amélioration.
-            self.construire("Laboratoire")
-            self.rechercher("Armes")
-            self.rechercher("Bouclier Thoracique")
-            self.rechercher("Vitesse de chasse")
-            self.rechercher("Technique de ponte")
-            self.construire("Couveuse")
-            self.construire("Solarium")
-            self.construire("Entrepôt de Matériaux")
-            self.rechercher("Architecture")
-            self.rechercher("Vitesse d'attaque")
+            with self.verrou:
+                if self.chasser("Jeune Soldate"):
+                    # Ponte.
+                    self.pondre("Ouvriere", 0.3)
+                    self.pondre("Jeune Soldate Naine", 0.2)
+                    self.pondre("Jeune Soldate", 0.5)
+                # Travail. 
+                self.faire_travailler()
 
             nbr_boucle += 1
 
+        print("chasse fin")
+
+    def boucle_amelioration(self):
+        while self.boucle_ameliorer:
+            # Construction et amélioration.
+            with self.verrou:
+                try:
+                    self.construire("Laboratoire")
+                    self.rechercher("Armes")
+                    self.rechercher("Bouclier Thoracique")
+                    self.rechercher("Vitesse de chasse")
+                    self.rechercher("Technique de ponte")
+                    self.construire("Couveuse")
+                    self.construire("Solarium")
+                    self.construire("Entrepôt de Matériaux")
+                    self.rechercher("Architecture")
+                    self.rechercher("Vitesse d'attaque")
+                except:
+                    print("Erreur amélioration.")
+            dormir(60*1)
+        print("amelioration fin")
+
     def __str__(self):
-        text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc)
+        text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc, {4} Jeune Soldates.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc, self.armee["Jeune Soldate"])
         return text
 
 
