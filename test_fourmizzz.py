@@ -43,7 +43,7 @@ def test_combattre():
     armee1 = Armee(Troupe(jsn, 1000))
     armee2 = Armee(Troupe(jsn, 1000))
     armee3, armee4 = armee1.combattre(armee2)
-    assert armee3.__repr__() == "[Jeune soldate naine(762)]"
+    assert armee3.__repr__() == "[Jeune soldate naine(493)]"
 
 def test_difference():
     armee1 = Armee(Troupe(jsn, 1000), Troupe(s, 500))
@@ -55,10 +55,12 @@ def test_difference():
 
 def test_operateur():
     armee1 = Armee(Troupe(jsn, 1000))
-    armee2 = Armee(Troupe(jsn, 1000))
-    assert armee1 == armee2
+    assert armee1 == Armee(Troupe(jsn, 1000))
+    assert armee1 < Armee(Troupe(jsn, 1010))
+    assert Armee(Troupe(c, 1000)) == Armee(Troupe(c, 1000))
 
-
+    assert armee1 > Armee(Troupe(jsn, 500))
+    assert armee1 < Armee(Troupe(jsn, 1500))
 
 
 

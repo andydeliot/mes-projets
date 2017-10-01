@@ -1,4 +1,5 @@
 
+from functools import total_ordering
 
 temps_recolte = 30 * 60
 
@@ -44,9 +45,10 @@ class Troupe:
         return self.fourmi.nom + "(" + str(self.nombre) + ")"
 
 
+@total_ordering
 class Armee:
     def __init__(self, *troupes):
-        self.troupes = [Troupe(troupe.fourmi, troupe.nombre) for troupe in troupes if troupe.nombre > 0]
+        self.troupes = [Troupe(troupe.fourmi, int(troupe.nombre)) for troupe in troupes if troupe.nombre > 0]
 
         self.vie = 0
         self.attaque = 0
@@ -77,13 +79,19 @@ class Armee:
         assert type(other) is Armee, "Impossible de comparé autre chose qu'une armée."
         attaquante1, defenseuse1 = self.combattre(other)
         attaquante2, defenseuse2 = other.combattre(self)
-        return attaquante1.vivante() and attaquante2.vivante()
+        return attaquante1.temps + defenseuse2.temps == defenseuse1.temps + attaquante2.temps
+
+    def __gt__(self, other):
+        assert type(other) is Armee, "Impossible de comparé autre chose qu'une armée."
+        attaquante1, defenseuse1 = self.combattre(other)
+        attaquante2, defenseuse2 = other.combattre(self)
+        return attaquante1.temps + defenseuse2.temps > defenseuse1.temps + attaquante2.temps
 
     def vivante(self):
         """ Retourne vrai si l'armée n'est pas vide de troupes. """
         return self.troupes != []
 
-    def combattre(self, armee):
+    def combattre(self, armee, printer=False):
         """ Fait combatre les deux armées. Retourne également les deux armées, l'armée attaquante en premiere position. """
         armee_attaque = self
         armee_defense = armee
@@ -96,15 +104,19 @@ class Armee:
                 coef_defense = 0.5
             else:
                 coef_defense = 1
-            armee_defense = armee_attaque.attaquer(armee_defense, armee_attaque.attaque)
-            armee_attaque = armee_defense.attaquer(armee_attaque, armee_defense.defense*coef_defense)
-            print("")
+            armee_defense_temp = armee_attaque.attaquer(armee_defense, armee_attaque.attaque, printer)
+            armee_attaque = armee_defense.attaquer(armee_attaque, armee_defense.defense*coef_defense, printer)
+            armee_defense = armee_defense_temp
+            if printer: print("")
+
+        if printer: print(armee_attaque, armee_defense)
         return armee_attaque, armee_defense
 
-    def attaquer(self, armee, degat):
+    def attaquer(self, armee, degat, printer=False):
         """ Retourne l'armée attaqué. """
-        print(self)
-        print("Les attaquantes infligent {0} points de dégats.".format(degat))
+        if printer:
+            print(self)
+            print("Les attaquantes infligent {0} points de dégats.".format(degat))
 
         troupes = []
         for troupe in armee.troupes:
@@ -113,9 +125,22 @@ class Armee:
 
             degat -= tue * troupe.fourmi.vie
             troupes.append(Troupe(troupe.fourmi, troupe.nombre - tue))
-            print("Les défenseuses perdent {0} {1}.".format(tue, troupe.fourmi.nom))
+            if printer:
+                print("Les défenseuses perdent {0} {1}.".format(tue, troupe.fourmi.nom))
 
         return Armee(*troupes)
+
+    def attaque_temps(self, armee):
+        """ Retourne le temps final lorsque l'armée attaque une autre armée. """
+        armee_final, _ = self.combattre(armee)
+        print(armee_final.temps)
+        return armee_final.temps
+
+    def defense_temps(self, armee):
+        """ Retourne le temps final lorsque l'armée attaque une autre armée. """
+        _, armee_final = armee.combattre(self)
+        print(armee_final.temps)
+        return armee_final.temps
 
     def difference(self, armee):
         """ Retourne une armée représentant la différence entre les deux armées. Les deux armées doivent avoir les même types de troupes. """
@@ -148,9 +173,12 @@ t = Fourmi("Tank", 35, 55, 1, 134, 100)
 tu = Fourmi("Tueuse", 50, 50, 50, 197, 80)
 tue = Fourmi("Tueuse d'élite", 55, 55, 55, 197, 90)
 
+fourmis = [jsn, sn, ne, js, s, c, a, ae, se, t, tu, tue]
+
 
 def statistiques():
-    fourmis = [jsn, sn, ne, js, s, c, a, ae, se, t, tu, tue]
+    print(fourmis)
+    print("")
 
     fourmis_nombre = sorted(fourmis, key=lambda f: f.nombre_par_recolte, reverse=True)
     print("Nombre :", fourmis_nombre)
@@ -167,17 +195,33 @@ def statistiques():
     fourmis_nourriture = sorted(fourmis, key=lambda f: f.nourriture_par_recolte, reverse=True)
     print("Nourriture :", fourmis_nourriture)
 
+    fourmis_combat = [Armee(Troupe(fourmi, fourmi.nombre_par_recolte)) for fourmi in fourmis]
+    fourmis_combat = sorted(fourmis_combat)
+    print("Combat entre elles :", fourmis_combat)
+    
+    fourmis_combat_temps = [Armee(Troupe(fourmi, fourmi.nombre_par_recolte*10)) for fourmi in fourmis]
+    fourmis_combat_temps = sorted(fourmis_combat_temps, key=lambda a: a.attaque_temps(Armee(Troupe(c, 100))))
+    print("Combat temps :", fourmis_combat_temps)
+
+    fourmis_defense_temps = [Armee(Troupe(fourmi, fourmi.nombre_par_recolte*10)) for fourmi in fourmis]
+    fourmis_defense_temps = sorted(fourmis_defense_temps, key=lambda a: a.defense_temps(Armee(Troupe(jsn, 1000))))
+    print("Defense temps :", fourmis_defense_temps)
+
+
+def combat_uni_unite(armee):
+    for f in fourmis:
+        pass
 
 
 if __name__ == "__main__":
     armee1 = Armee(Troupe(jsn, 1000), Troupe(a, 500))
     armee2 = Armee(Troupe(c, 300), Troupe(s, 500))
 
-    armee3 = armee1.combattre(armee2)
+    armee3 = armee1.combattre(armee2, printer= True)
 
     mon_armee = Armee(Troupe(jsn, 2493), Troupe(se, 502), Troupe(ne, 338), Troupe(js, 2000), Troupe(a, 382))
 
-
+    statistiques()
 
 
 
