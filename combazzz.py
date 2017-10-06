@@ -1,54 +1,63 @@
 
 from functools import total_ordering
+from math import ceil
 
 temps_recolte = 30 * 60
 
 
 class Fourmi:
-    def __init__(self, nom, vie, attaque, defense, temps, nourriture, nombre=1):
-        self.nom = nom
+    def __init__(self, nom, vie, attaque, defense, temps, nourriture):
+        self.NOM = nom
 
-        self.vie = vie
-        self.attaque = attaque
-        self.defense = defense
-        self.temps = temps
-        self.nourriture = nourriture
+        self.VIE = vie
+        self.ATTAQUE = attaque
+        self.DEFENSE = defense
+        self.TEMPS = temps
+        self.NOURRITURE = nourriture
 
         # Stats.
-        self.nombre_par_recolte = temps_recolte / self.temps
-        self.vie_par_recolte = self.vie * self.nombre_par_recolte
-        self.attaque_par_recolte = self.attaque * self.nombre_par_recolte
-        self.defense_par_recolte = self.defense * self.nombre_par_recolte
-        self.nourriture_par_recolte = self.nourriture * self.nombre_par_recolte
+        self.nombre_par_recolte = temps_recolte / self.TEMPS
+        self.vie_par_recolte = self.VIE * self.nombre_par_recolte
+        self.attaque_par_recolte = self.ATTAQUE * self.nombre_par_recolte
+        self.defense_par_recolte = self.DEFENSE * self.nombre_par_recolte
+        self.nourriture_par_recolte = self.NOURRITURE * self.nombre_par_recolte
 
     def __repr__(self):
-        return self.nom
+        return self.NOM
 
 
 class Troupe:
-    def __init__(self, fourmi, nombre):
+    def __init__(self, fourmi, nombre, vie=None):
         self.fourmi = fourmi
-        self.nombre = nombre # N'interviens pas dans les stats.
+        self.nombre = nombre if nombre > 0 else 0
 
-        self.vie = self.fourmi.vie * self.nombre
-        self.attaque = self.fourmi.attaque * self.nombre
-        self.defense = self.fourmi.defense * self.nombre
-        self.temps = self.fourmi.temps * self.nombre
-        self.nourriture = self.fourmi.nourriture * self.nombre
+        if vie is None:
+            self.vie = self.fourmi.VIE * self.nombre
+        else:
+            self.vie = vie
+        self.attaque = self.fourmi.ATTAQUE * self.nombre
+        self.defense = self.fourmi.DEFENSE * self.nombre
+        self.temps = self.fourmi.TEMPS * self.nombre
+        self.nourriture = self.fourmi.NOURRITURE * self.nombre
 
     def egale(self, other):
         assert type(other) is Troupe, "Le comparateur n'est pas de type Troupe."
         return True if self.fourmi is other.fourmi and self.nombre == other.nombre else False
 
+    def subi(self, degat):
+        """ Retourne la troupe avec le nouveau nombre de fourmis, et son nouveau nombre de points de vie. """
+        vie = self.vie - degat
+        nombre = ceil(vie / self.fourmi.VIE)
+        return Troupe(self.fourmi, nombre, vie)
 
     def __repr__(self):
-        return self.fourmi.nom + "(" + str(self.nombre) + ")"
+        return self.fourmi.NOM + "(" + str(self.nombre) + ")"
 
 
 @total_ordering
 class Armee:
     def __init__(self, *troupes):
-        self.troupes = [Troupe(troupe.fourmi, int(troupe.nombre)) for troupe in troupes if troupe.nombre > 0]
+        self.troupes = [Troupe(troupe.fourmi, int(troupe.nombre), troupe.vie) for troupe in troupes if troupe.nombre > 0]
 
         self.vie = 0
         self.attaque = 0
@@ -64,14 +73,11 @@ class Armee:
 
     def egale(self, other):
         assert type(other) is Armee, "Le comparateur n'est pas de type Armee."
-        if len(self.troupes) != len(other.troupes):
-            return False
+        if len(self.troupes) != len(other.troupes): return False
         i = 0
         while True:
-            if i >= len(self.troupes):
-                break
-            if not self.troupes[i].egale(other.troupes[i]):
-                return False
+            if i >= len(self.troupes): break
+            if not self.troupes[i].egale(other.troupes[i]): return False
             i += 1
         return True
 
@@ -93,6 +99,7 @@ class Armee:
 
     def combattre(self, armee, printer=False):
         """ Fait combatre les deux armées. Retourne également les deux armées, l'armée attaquante en premiere position. """
+        if printer: print("-"*90)
         armee_attaque = self
         armee_defense = armee
         while armee_attaque.vivante() and armee_defense.vivante():
@@ -120,13 +127,12 @@ class Armee:
 
         troupes = []
         for troupe in armee.troupes:
-            tue = int(degat / troupe.fourmi.vie)
-            tue = troupe.nombre if tue > troupe.nombre else tue
+            new_troupe = troupe.subi(degat)
+            degat = -new_troupe.vie if new_troupe.vie < 0 else 0
 
-            degat -= tue * troupe.fourmi.vie
-            troupes.append(Troupe(troupe.fourmi, troupe.nombre - tue))
+            troupes.append(new_troupe)
             if printer:
-                print("Les défenseuses perdent {0} {1}.".format(tue, troupe.fourmi.nom))
+                print("Les défenseuses perdent {0} {1}. ({2} pv)".format(troupe.nombre - new_troupe.nombre, new_troupe.fourmi.NOM, new_troupe.vie))
 
         return Armee(*troupes)
 
@@ -214,22 +220,29 @@ def combat_uni_unite(armee):
 
 
 if __name__ == "__main__":
-    armee1 = Armee(Troupe(jsn, 1000), Troupe(a, 500))
-    armee2 = Armee(Troupe(c, 300), Troupe(s, 500))
+##    armee1 = Armee(Troupe(jsn, 1000), Troupe(a, 500))
+##    armee2 = Armee(Troupe(c, 300), Troupe(s, 500))
+##
+##    armee3 = armee1.combattre(armee2, printer= True)
+##
+##    mon_armee = Armee(Troupe(jsn, 2493), Troupe(se, 502), Troupe(ne, 338), Troupe(js, 2000), Troupe(a, 382))
+##
+##    statistiques()
 
-    armee3 = armee1.combattre(armee2, printer= True)
+    mon_armee = Armee(Troupe(js, 3000), Troupe(s, 900), Troupe(a, 4500))
+    guigui0025 = Armee(Troupe(jsn, 500), Troupe(sn, 500), Troupe(ne, 500), Troupe(js, 500))
+    petitionner = Armee(Troupe(jsn, 99), Troupe(sn, 967), Troupe(ne, 2859))
+    zarby89 = Armee(Troupe(jsn, 2238), Troupe(sn, 753), Troupe(ne, 398))
 
-    mon_armee = Armee(Troupe(jsn, 2493), Troupe(se, 502), Troupe(ne, 338), Troupe(js, 2000), Troupe(a, 382))
+    mon_armee.combattre(guigui0025, printer=True)
+    mon_armee.combattre(petitionner, printer=True)
+    mon_armee.combattre(zarby89, printer=True)
+    
 
-    statistiques()
-
-
-
-
-
-
-
-
+    ma_defense = Armee(Troupe(jsn, 2400), Troupe(sn, 500), Troupe(ne, 338), Troupe(se, 171))
+    guigui0025.combattre(ma_defense, True)
+    petitionner.combattre(ma_defense, True)
+    zarby89.combattre(ma_defense)
 
 
 

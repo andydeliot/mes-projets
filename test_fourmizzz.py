@@ -21,6 +21,14 @@ def test_troupe():
     assert not troupe.egale(Troupe(jsn, 999))
     assert not troupe.egale(Troupe(s, 1000))
 
+def test_subi():
+    troupe = Troupe(jsn, 1000)
+    troupe = troupe.subi(4000)
+    assert troupe.vie == 4000
+    assert troupe.nombre == 500
+    assert Troupe(jsn, 1).subi(50).nombre == 0
+
+
 def test_armee():
     armee = Armee(Troupe(jsn, 1000), Troupe(s, 500))
     assert armee.vie == 18000
@@ -31,7 +39,6 @@ def test_armee():
     assert armee.egale(Armee(Troupe(jsn, 1000), Troupe(s, 500)))
     assert not armee.egale(Armee(Troupe(jsn, 999), Troupe(s, 500)))
     assert not armee.egale(Armee(Troupe(jsn, 1000), Troupe(se, 500)))
-
 
 def test_attaquer():
     armee1 = Armee(Troupe(jsn, 1000))
@@ -44,6 +51,7 @@ def test_combattre():
     armee2 = Armee(Troupe(jsn, 1000))
     armee3, armee4 = armee1.combattre(armee2)
     assert armee3.__repr__() == "[Jeune soldate naine(493)]"
+    assert (Armee(Troupe(jsn, 1)).combattre(Armee(Troupe(jsn, 1)))).__repr__() == "([Jeune soldate naine(1)], [])"
 
 def test_difference():
     armee1 = Armee(Troupe(jsn, 1000), Troupe(s, 500))
