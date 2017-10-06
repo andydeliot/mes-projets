@@ -79,17 +79,28 @@ def test_fourmis_point_defense(jsn):
     assert jsn.point_defense() == 2
 
 def test_fourmis_point_defense_bonus_1():
-    jsn = JeuneSoldateNaine(Fourmilliere(defense=1), 1)
+    jsn = JeuneSoldateNaine(Fourmilliere(arme=1), 1)
     assert jsn.point_defense() == 2
 
 def test_fourmis_point_defense_bonus_2():
-    jsn = JeuneSoldateNaine(Fourmilliere(defense=2), 1)
+    jsn = JeuneSoldateNaine(Fourmilliere(arme=2), 1)
     assert jsn.point_defense() == 2
 
 def test_10_fourmis_point_defense_bonus_1():
-    jsn = JeuneSoldateNaine(Fourmilliere(defense=1), 10)
+    jsn = JeuneSoldateNaine(Fourmilliere(arme=1), 10)
     assert jsn.point_defense() == 22
 
+
+def test_fourmis_point_vie(jsn):
+    assert jsn.point_vie() == 8
+
+def test_fourmis_point_vie_bonus_1():
+    jsn = JeuneSoldateNaine(Fourmilliere(defense=1), 1)
+    assert jsn.point_vie() == 9
+
+def test_fourmis_point_vie_bonus_dome():
+    jsn = JeuneSoldateNaine(Fourmilliere(), 1, "Dome")
+    assert jsn.point_vie() == 9
 
 # Fourmilliere.
 

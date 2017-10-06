@@ -47,7 +47,7 @@ class Fourmi:
 
     def point_vie(self):
         """ Retourne le nombre de points de vie totale. """
-        return self.__class__.VIE * self.bonus_defense * self.nombre
+        return round(self.__class__.VIE * self.bonus_defense * (1 + self.fourmilliere.defense * 0.1) * self.nombre)
 
     def point_attaque(self):
         """ Retourne le nombre de points d'attaque. """
@@ -55,7 +55,7 @@ class Fourmi:
 
     def point_defense(self):
         """ Retourne le nombre de points d'attaque. """
-        return round(self.__class__.DEFENSE * (1 + self.fourmilliere.defense * 0.1) * self.nombre)
+        return round(self.__class__.DEFENSE * (1 + self.fourmilliere.arme * 0.1) * self.nombre)
 
     def __repr__(self):
         return self.__class__.NOM + " (" + str(self.nombre) + ")"
