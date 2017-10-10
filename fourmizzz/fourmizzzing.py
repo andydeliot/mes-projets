@@ -303,6 +303,7 @@ class Fourmilliere:
             self.construire("Couveuse")
             self.construire("Solarium")
             self.construire("Laboratoire")
+            self.construire("Salle d'analyse")
             self.construire("Etable à cochenilles")
 
             self.rechercher("Technique de ponte")
