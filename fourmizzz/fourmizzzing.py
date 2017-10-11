@@ -322,11 +322,13 @@ class Fourmilliere:
         return text
 
 
-# Récupérer les informations.
-
-f = Fourmilliere()
-
 if __name__ == "__main__":
+    while True:
+        try:
+            f = Fourmilliere()
+            break
+        except:
+            pass
     f.boucle()
 
     pass
