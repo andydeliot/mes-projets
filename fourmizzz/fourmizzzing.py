@@ -260,12 +260,14 @@ class Fourmilliere:
     def boucle(self):
         """ Tourne le programme en boucle. """
         print(self)
-        self.connexion()
         while True:
-            self.boucle_chasse()
-            self.boucle_amelioration()
-            dormir(60)
-
+            try:
+                self.connexion()
+                self.boucle_chasse()
+                self.boucle_amelioration()
+                dormir(60)
+            except:
+                dormir(5)
 
     def boucle_chasse(self):
         # Regarder combien de temps avant la prochaine chasse..
