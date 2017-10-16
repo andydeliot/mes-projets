@@ -323,12 +323,7 @@ class Fourmilliere:
 
 
 if __name__ == "__main__":
-    while True:
-        try:
-            f = Fourmilliere()
-            break
-        except:
-            pass
+    f = Fourmilliere()
     f.boucle()
 
     pass
