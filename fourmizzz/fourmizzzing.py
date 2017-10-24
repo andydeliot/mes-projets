@@ -314,6 +314,7 @@ class Fourmilliere:
             self.rechercher("Architecture")
             self.rechercher("Communication avec les animaux")
             self.rechercher("Vitesse de chasse")
+            self.rechercher("Vitesse d'attaque")
         except:
             print("Erreur amélioration.")
 
