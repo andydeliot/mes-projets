@@ -94,8 +94,6 @@ class Fourmilliere:
             
             self.browser.submit_form(form)
             print("Connecté.")
-        else:
-            print("La connection n'a pas fonctionné.")
 
     def get_ressource(self):
         """ Recueil les ressources de bases du jeu. """
@@ -162,6 +160,7 @@ class Fourmilliere:
         
         form = self.browser.get_form(action="Ressources.php")
         if form is not None:
+            print(form)
             form["RecolteNourriture"] = nourriture
             form["RecolteMateriaux"] = materiaux
             self.browser.submit_form(form)
@@ -280,26 +279,27 @@ class Fourmilliere:
     def boucle_chasse(self):
         # Regarder combien de temps avant la prochaine chasse..
         self.get_temps_chasse()
-        temps_restant = int(self.temps_chasse.seconds / 60)
+        temps_restant = self.temps_chasse.seconds
         if not temps_restant:
             self.get_ressource()
             self.get_armee()
             print(str(self) + " (" + str(self.nbr_boucle) + ")" )
         else:
-            print(str(temps_restant), end=" ")
+            print(str(int(temps_restant/60)), end=" ")
 
         # Début.
-        self.production = 0
-        if self.chasser("Jeune Soldate", "Artilleuse"):
-            self.pondre("Ouvriere", 0.3)
-            self.pondre("Jeune Soldate Naine", 0.1)
-            self.pondre("Concierge", 0.1)
-            self.pondre("Jeune Soldate", 0.25)
-            self.pondre("Artilleuse", 0.25)
+        if not temps_restant:
+            self.production = 0
+            if self.chasser("Jeune Soldate", "Artilleuse"):
+                self.pondre("Ouvriere", 0.3)
+                self.pondre("Jeune Soldate Naine", 0.1)
+                self.pondre("Concierge", 0.1)
+                self.pondre("Jeune Soldate", 0.25)
+                self.pondre("Artilleuse", 0.25)
 
-            self.faire_travailler()
+                self.faire_travailler()
 
-            self.nbr_boucle += 1
+                self.nbr_boucle += 1
 
     def boucle_amelioration(self):
         self.construire("Champignonnière")
