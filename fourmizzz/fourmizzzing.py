@@ -81,15 +81,13 @@ class Fourmilliere:
         url = "http://s4.fourmizzz.fr/Reine.php"
         self.browser.open(url)
 
-        try:
-            form = self.browser.get_form(id="loginForm")
+        form = self.browser.get_form(id="loginForm")
+        if form is not None:
             form["pseudo"] = "AdrenalineChallenger"
             form["mot_passe"] = "p3Ace70v3zzz"
 
             self.browser.submit_form(form)
             print("Connecté.")
-        except:
-            pass
 
     def get_ressource(self):
         """ Recueil les ressources de bases du jeu. """
@@ -155,9 +153,10 @@ class Fourmilliere:
         materiaux = ouvrieres - nourriture
         
         form = self.browser.get_form(action="Ressources.php")
-        form["RecolteNourriture"] = nourriture
-        form["RecolteMateriaux"] = materiaux
-        self.browser.submit_form(form)
+        if form is not None:
+            form["RecolteNourriture"] = nourriture
+            form["RecolteMateriaux"] = materiaux
+            self.browser.submit_form(form)
 
     def cm2_chassable(self, *types_unite):
         """ Retourne le nombre de cm2 conquerable selon les unités donnée. """
@@ -185,11 +184,13 @@ class Fourmilliere:
 
         # Mettre les arméees inutiles à 0.
         form = self.browser.get_form(action="AcquerirTerrain.php")
+        print(form)
         for cle, item in Fourmilliere.equivalent.items():
             if cle in types_unite:
-                if form[item] == 0:
-                    print("Erreur unité")
-                    return False
+                if item in form.keys():
+                    if form[item] == 0:
+                        print("Erreur unité")
+                        return False
             else:
                 try: form[item] = 0
                 except: pass
@@ -261,62 +262,52 @@ class Fourmilliere:
         """ Tourne le programme en boucle. """
         print(self)
         while True:
-            try:
-                self.connexion()
-                self.boucle_chasse()
-                self.boucle_amelioration()
-                dormir(60)
-            except:
-                dormir(5)
+            self.connexion()
+            self.boucle_chasse()
+            self.boucle_amelioration()
+            dormir(60)
 
     def boucle_chasse(self):
         # Regarder combien de temps avant la prochaine chasse..
-        try:
-            self.get_temps_chasse()
-            temps_restant = int(self.temps_chasse.seconds / 60)
-            if not temps_restant:
-                self.get_ressource()
-                self.get_armee()
-                print(str(self) + " (" + str(self.nbr_boucle) + ")" )
-            else:
-                print(str(temps_restant), end=" ")
+        self.get_temps_chasse()
+        temps_restant = int(self.temps_chasse.seconds / 60)
+        if not temps_restant:
+            self.get_ressource()
+            self.get_armee()
+            print(str(self) + " (" + str(self.nbr_boucle) + ")" )
+        else:
+            print(str(temps_restant), end=" ")
 
-            # Début.
-            self.production = 0
-            if self.chasser("Jeune Soldate", "Artilleuse"):
-                self.pondre("Ouvriere", 0.3)
-                self.pondre("Jeune Soldate Naine", 0.1)
-                self.pondre("Concierge", 0.1)
-                self.pondre("Jeune Soldate", 0.25)
-                self.pondre("Artilleuse", 0.25)
+        # Début.
+        self.production = 0
+        if self.chasser("Jeune Soldate", "Artilleuse"):
+            self.pondre("Ouvriere", 0.3)
+            self.pondre("Jeune Soldate Naine", 0.1)
+            self.pondre("Concierge", 0.1)
+            self.pondre("Jeune Soldate", 0.25)
+            self.pondre("Artilleuse", 0.25)
 
-                self.faire_travailler()
+            self.faire_travailler()
 
-                self.nbr_boucle += 1
-        except Exception as e:
-            print(e)
-            pass
+            self.nbr_boucle += 1
 
     def boucle_amelioration(self):
-        try:
-            self.construire("Champignonnière")
-            self.construire("Entrepôt de Nourriture")
-            self.construire("Entrepôt de Matériaux")
-            self.construire("Couveuse")
-            self.construire("Solarium")
-            self.construire("Laboratoire")
-            self.construire("Salle d'analyse")
-            self.construire("Etable à cochenilles")
+        self.construire("Champignonnière")
+        self.construire("Entrepôt de Nourriture")
+        self.construire("Entrepôt de Matériaux")
+        self.construire("Couveuse")
+        self.construire("Solarium")
+        self.construire("Laboratoire")
+        self.construire("Salle d'analyse")
+        self.construire("Etable à cochenilles")
 
-            self.rechercher("Technique de ponte")
-            self.rechercher("Bouclier Thoracique")
-            self.rechercher("Armes")
-            self.rechercher("Architecture")
-            self.rechercher("Communication avec les animaux")
-            self.rechercher("Vitesse de chasse")
-            self.rechercher("Vitesse d'attaque")
-        except:
-            print("Erreur amélioration.")
+        self.rechercher("Technique de ponte")
+        self.rechercher("Bouclier Thoracique")
+        self.rechercher("Armes")
+        self.rechercher("Architecture")
+        self.rechercher("Communication avec les animaux")
+        self.rechercher("Vitesse de chasse")
+        self.rechercher("Vitesse d'attaque")
 
     def __str__(self):
         text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc, {4} unités.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc, self.armee_totale())
@@ -326,6 +317,4 @@ class Fourmilliere:
 if __name__ == "__main__":
     f = Fourmilliere()
     f.boucle()
-
-    pass
 
