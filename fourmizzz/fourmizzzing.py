@@ -53,6 +53,12 @@ class Fourmilliere:
 
     def __init__(self):
         self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0")
+
+        # Compte.
+        with open("login.txt") as file:
+            data = file.readlines()
+            self.login = data[0]
+            self.mdp = data[1]
         self.connexion()
 
         # Ressources.
@@ -83,8 +89,8 @@ class Fourmilliere:
 
         form = self.browser.get_form(id="loginForm")
         if form is not None:
-            form["pseudo"] = "AdrenalineChallenger"
-            form["mot_passe"] = "p3Ace70v3zzz"
+            form["pseudo"] = self.login
+            form["mot_passe"] = self.mdp
 
             self.browser.submit_form(form)
             print("Connecté.")
