@@ -56,7 +56,7 @@ class Fourmilliere:
 
         # Compte.
         with open("login.txt") as file:
-            data = file.readlines()
+            data = file.read().split("\n")
             self.login = data[0]
             self.mdp = data[1]
         self.connexion()
@@ -91,9 +91,11 @@ class Fourmilliere:
         if form is not None:
             form["pseudo"] = self.login
             form["mot_passe"] = self.mdp
-
+            
             self.browser.submit_form(form)
             print("Connecté.")
+        else:
+            print("La connection n'a pas fonctionné.")
 
     def get_ressource(self):
         """ Recueil les ressources de bases du jeu. """
@@ -163,6 +165,8 @@ class Fourmilliere:
             form["RecolteNourriture"] = nourriture
             form["RecolteMateriaux"] = materiaux
             self.browser.submit_form(form)
+        else:
+            print("La mise au travail n'a pas fonctionné.")
 
     def cm2_chassable(self, *types_unite):
         """ Retourne le nombre de cm2 conquerable selon les unités donnée. """
