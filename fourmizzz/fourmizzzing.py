@@ -55,10 +55,12 @@ class Fourmilliere:
         self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0")
 
         # Compte.
-        with open("login.txt") as file:
-            data = file.read().split("\n")
-            self.login = data[0]
-            self.mdp = data[1]
+##        with open("./login.txt") as file:
+##            data = file.read().split("\n")
+##            self.login = data[0]
+##            self.mdp = data[1]
+        self.login = "adrenalineChallenger"
+        self.mdp = "p3Ace70v3zzz"
         self.connexion()
 
         # Ressources.
@@ -285,7 +287,7 @@ class Fourmilliere:
             self.get_armee()
             print(str(self) + " (" + str(self.nbr_boucle) + ")" )
         else:
-            print(str(int(temps_restant/60)), end=" ")
+            print(str(int(temps_restant/60)))#, end=" ")
 
         # Début.
         if not temps_restant:
@@ -318,6 +320,8 @@ class Fourmilliere:
         self.rechercher("Communication avec les animaux")
         self.rechercher("Vitesse de chasse")
         self.rechercher("Vitesse d'attaque")
+
+        print("-")#, end=" ")
 
     def __str__(self):
         text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc, {4} unités.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc, self.armee_totale())
