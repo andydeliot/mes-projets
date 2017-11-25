@@ -87,7 +87,12 @@ class Fourmilliere:
     def connexion(self):
         """ Connexion avec nom d'utilisateur et mdp. """
         url = "http://s4.fourmizzz.fr/Reine.php"
-        self.browser.open(url)
+        while True:
+            try:
+                self.browser.open(url)
+                break
+            except:
+                pass
 
         form = self.browser.get_form(id="loginForm")
         if form is not None:
@@ -188,7 +193,7 @@ class Fourmilliere:
 
         form = self.browser.get_form(action="AcquerirTerrain.php")
         if form is None:
-            print("Erreur form")
+            print("Erreur form chasser")
             return False
         form["AcquerirTerrain"] = cm2
         self.browser.submit_form(form)
@@ -330,5 +335,5 @@ class Fourmilliere:
 
 if __name__ == "__main__":
     f = Fourmilliere()
-    f.boucle()
+    #f.boucle()
 
