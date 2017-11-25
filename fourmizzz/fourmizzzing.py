@@ -92,6 +92,7 @@ class Fourmilliere:
                 self.browser.open(url)
                 break
             except:
+                print("Erreur de connexion...")
                 pass
 
         form = self.browser.get_form(id="loginForm")
