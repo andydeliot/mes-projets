@@ -87,13 +87,15 @@ class Fourmilliere:
     def connexion(self):
         """ Connexion avec nom d'utilisateur et mdp. """
         url = "http://s4.fourmizzz.fr/Reine.php"
-        while True:
-            try:
-                self.browser.open(url)
-                break
-            except:
-                print("Erreur de connexion...")
-                pass
+##        while True:
+##            try:
+##                self.browser.open(url)
+##                break
+##            except:
+##                print("Erreur de connexion")
+##                pass
+
+        self.browser.open(url)
 
         form = self.browser.get_form(id="loginForm")
         if form is not None:
