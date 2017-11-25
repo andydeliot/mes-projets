@@ -335,5 +335,5 @@ class Fourmilliere:
 
 if __name__ == "__main__":
     f = Fourmilliere()
-    #f.boucle()
+    f.boucle()
 
