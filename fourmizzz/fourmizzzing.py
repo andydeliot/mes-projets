@@ -52,7 +52,8 @@ class Fourmilliere:
                   "Tueuse d'élite":"unite12"}
 
     def __init__(self):
-        self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0")
+        self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0",
+                                   parser="lxml")
 
         # Compte.
 ##        with open("./login.txt") as file:
@@ -93,22 +94,27 @@ class Fourmilliere:
                 break
             except:
                 print("Erreur de connexion")
+                dormir(1)
                 pass
 
         form = self.browser.get_form(id="loginForm")
         if form is not None:
             form["pseudo"] = self.login
             form["mot_passe"] = self.mdp
-            
+
             self.browser.submit_form(form)
             print("Connecté.")
 
     def get_ressource(self):
         """ Recueil les ressources de bases du jeu. """
-        self.ouvrieres = int(self.browser.find(id="nb_ouvrieres").text)
-        self.nourriture = int(self.browser.find(id="nb_nourriture").text.split(".")[0])
-        self.bois = int(self.browser.find(id="nb_materiaux").text)
-        self.tdc = int(self.browser.find(id="quantite_tdc").text)
+        try:
+            self.ouvrieres = int(self.browser.find(id="nb_ouvrieres").text)
+            self.nourriture = int(self.browser.find(id="nb_nourriture").text.split(".")[0])
+            self.bois = int(self.browser.find(id="nb_materiaux").text)
+            self.tdc = int(self.browser.find(id="quantite_tdc").text)
+        except AttributeError:
+            print("Erreur lors de la récupération des ressources.")
+            print(self.browser.url)
 
     def get_armee(self):
         self.page("Armée")
@@ -182,6 +188,8 @@ class Fourmilliere:
         for unite in types_unite:
             cm2 += int(self.armee[unite] * 0.03)
         return cm2
+
+### Action ###
 
     def chasser(self, *types_unite):
         """ Permet de chasser proportionnelement à la taille de l'unité qui va chasser. """
@@ -293,7 +301,7 @@ class Fourmilliere:
             self.get_armee()
             print(str(self) + " (" + str(self.nbr_boucle) + ")" )
         else:
-            print(str(int(temps_restant/60)))#, end=" ")
+            print(str(int(temps_restant/60)), end=" ")
 
         # Début.
         if not temps_restant:
@@ -327,7 +335,7 @@ class Fourmilliere:
         self.rechercher("Vitesse de chasse")
         self.rechercher("Vitesse d'attaque")
 
-        print("-")#, end=" ")
+        print("-", end=" ")
 
     def __str__(self):
         text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc, {4} unités.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc, self.armee_totale())
