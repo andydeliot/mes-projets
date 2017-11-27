@@ -681,6 +681,13 @@ def test_afficher_table(a, b, c, d, cont, taut):
     assert (a % b).afficher_table() == "a b | a ⇔ b\n-----------\n0 0 | 1\n0 1 | 0\n1 0 | 0\n1 1 | 1"
     assert ((a * c) + (b * d)).afficher_table() == "a b c d | (a ˄ c) ˅ (b ˄ d)\n---------------------------\n0 0 0 0 | 0\n0 0 0 1 | 0\n0 0 1 0 | 0\n0 0 1 1 | 0\n0 1 0 0 | 0\n0 1 0 1 | 1\n0 1 1 0 | 0\n0 1 1 1 | 1\n1 0 0 0 | 0\n1 0 0 1 | 0\n1 0 1 0 | 1\n1 0 1 1 | 1\n1 1 0 0 | 0\n1 1 0 1 | 1\n1 1 1 0 | 1\n1 1 1 1 | 1"
 
+def test_afficher_table_pas_changement_valeur(a, b, c, d, cont, taut):
+    a.valeur = False
+    b.valeur = True
+    (a + b).afficher_table()
+    assert a.valeur == False
+    assert b.valeur == True
+
 # Afficher modèle.
 
 def test_afficher_modele(a, b, c, d, cont, taut):
@@ -695,6 +702,12 @@ def test_afficher_modele(a, b, c, d, cont, taut):
     assert (a % b).afficher_modele() == "a b | a ⇔ b\n-----------\n0 0 | 1\n1 1 | 1"
     assert ((a * c) + (b * d)).afficher_modele() == "a b c d | (a ˄ c) ˅ (b ˄ d)\n---------------------------\n0 1 0 1 | 1\n0 1 1 1 | 1\n1 0 1 0 | 1\n1 0 1 1 | 1\n1 1 0 1 | 1\n1 1 1 0 | 1\n1 1 1 1 | 1"
 
+def test_afficher_modele_pas_changement_valeur(a, b, c, d, cont, taut):
+    a.valeur = False
+    b.valeur = True
+    (a + b).afficher_modele()
+    assert a.valeur == False
+    assert b.valeur == True
 
 
 

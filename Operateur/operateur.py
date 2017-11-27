@@ -181,18 +181,21 @@ class Element:
 
     def generer_table(self):
         """ Génère la table de vérité. Non testé."""
+        valeurs = [variable.valeur for variable in self.variables]
+        for variable in self.variables:
+            variable.valeur = False
         while True :
             yield self.afficher_valence()
             if not self.valeur_suivante():
                 break
+        for variable, valeur in zip(self.variables, valeurs):
+            variable.valeur = valeur
 
     def generer_modele(self):
         """ Génère les modèles de la formule. Non testé."""
-        while True :
+        for valence in self.generer_table():
             if self.calculer():
-                yield self.afficher_valence()
-            if not self.valeur_suivante():
-                break
+                yield valence
 
     def afficher_variables(self):
         """ Affiche les variables de la fonction ainsi que la fonction. (a + b).afficher_variables() = "a b | a ˅ b" """
@@ -206,8 +209,6 @@ class Element:
 
     def afficher_table(self):
         """ Affiche la table de vérité de la formule. """
-        for var in self.variables:
-            var.valeur = False
         affichage = ""
         affichage += self.afficher_variables() + "\n"
         affichage += "-" * len(self.afficher_variables())
@@ -220,9 +221,8 @@ class Element:
         affichage = ""
         affichage += self.afficher_variables() + "\n"
         affichage += "-" * len(self.afficher_variables())
-        for valence in self.generer_table():
-            if self.calculer():
-                affichage += "\n" + valence
+        for valence in self.generer_modele():
+            affichage += "\n" + valence
         return affichage
 
     def __str__(self):
@@ -230,6 +230,7 @@ class Element:
 
     def __repr__(self):
         return str(self)
+
 
 class Variable(Element):
     def __init__(self, nom, valeur=None):
@@ -368,7 +369,7 @@ class FormuleMultiElement(Element):
     def __init__(self, symbole, elements):
         assert len(elements) >= 2, "Il y a moins de 2 variables dans la formule."
         for element in elements:
-            assert isinstance(element, Element), "Un élément donné est mauvais : " + str(args)
+            assert isinstance(element, Element), "Un élément donné est mauvais : " + str(element)
         Element.__init__(self)
         self.symbole = symbole
         self.elements = elements

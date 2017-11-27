@@ -1,4 +1,4 @@
-from operateur11 import *
+from operateur import *
 from random import choice
 import cProfile
 
@@ -60,11 +60,11 @@ def retrouver_variable(variables, nom):
     return None
 
 if __name__ == "__main__":
-    profileur = cProfile.Profile()
-    profileur.enable()
+##    profileur = cProfile.Profile()
+##    profileur.enable()
 
     # Méta-data.
-    long = range(1, 6)
+    long = range(1, 5)
     
     # Génération des variables.
     variables = []
@@ -171,10 +171,10 @@ if __name__ == "__main__":
     else:
         quine2(f_final)
     
-    profileur.disable()
-    profileur.create_stats()
-    profileur.print_stats()
-
+##    profileur.disable()
+##    profileur.create_stats()
+##    profileur.print_stats()
+##
 
 
 
