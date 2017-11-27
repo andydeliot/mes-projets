@@ -53,7 +53,7 @@ class Fourmilliere:
 
     def __init__(self):
         self.browser = RoboBrowser(user_agent="Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0",
-                                   parser="lxml")
+                                   parser="html.parser")
 
         # Compte.
 ##        with open("./login.txt") as file:
