@@ -209,7 +209,9 @@ class Fourmilliere:
 
         # Mettre les arméees inutiles à 0.
         form = self.browser.get_form(action="AcquerirTerrain.php")
-        print(form)
+        if form is None:
+            print("Erreur form 2 chasser")
+            return False
         for cle, item in Fourmilliere.equivalent.items():
             if cle in types_unite:
                 if item in form.keys():
@@ -228,28 +230,38 @@ class Fourmilliere:
 
     def pondre(self, type_unite, pourcent):
         """ Permet de faire pondre la reine. Le pourcent correspond au temps de chasse. """
-        self.get_temps_chasse()
 
-        self.page("Reine")
 
         # Calcul temps.
-        type_unite = Fourmilliere.equivalent[type_unite]
-        input_unite = self.browser.find("input", {"value":type_unite})
-        tr = input_unite.parent.parent
-        spans = tr.findAll("span", {"style":"height:20px;width:85px;display:inline-block;"})
-        temps_unite = parser_temps(spans[0].text)
-        nourriture_unite = int(spans[1].text.replace(" ", ""))
+        while True:
+            try:
+                self.get_temps_chasse()
+
+                self.page("Reine")
+
+                type_unite = Fourmilliere.equivalent[type_unite]
+                input_unite = self.browser.find("input", {"value":type_unite})
+                tr = input_unite.parent.parent
+                spans = tr.findAll("span", {"style":"height:20px;width:85px;display:inline-block;"})
+                temps_unite = parser_temps(spans[0].text)
+                nourriture_unite = int(spans[1].text.replace(" ", ""))
+                break
+            except AttributeError:
+                print("Erreur lors du calcul du temps de ponte.")
 
         temps_possible = self.temps_chasse * pourcent
         nombre = int(temps_possible / temps_unite)
         quotien = timedelta(minutes=30) / self.temps_chasse
         self.production += int(nourriture_unite * nombre * quotien)
 
-        form = self.browser.get_form(action="Reine.php")
-        form["typeUnite"] = type_unite
-        form["nombre_de_ponte"] = nombre
+        try:
+            form = self.browser.get_form(action="Reine.php")
+            form["typeUnite"] = type_unite
+            form["nombre_de_ponte"] = nombre
 
-        self.browser.submit_form(form)
+            self.browser.submit_form(form)
+        except AttributeError:
+            print("Erreur lors de la ponte.")
 
     def construire(self, batiment):
         """ Cherche à construire un batiment particulier. """
@@ -307,11 +319,13 @@ class Fourmilliere:
         if not temps_restant:
             self.production = 0
             if self.chasser("Jeune Soldate", "Artilleuse"):
-                self.pondre("Ouvriere", 0.3)
-                self.pondre("Jeune Soldate Naine", 0.1)
-                self.pondre("Concierge", 0.1)
+                # Rembourser et améliorer l'armée.
                 self.pondre("Jeune Soldate", 0.25)
                 self.pondre("Artilleuse", 0.25)
+                # Améliorer la colonie et défendre.
+                self.pondre("Ouvriere", 0.3)
+                self.pondre("Jeune Soldate Naine", 0.05)
+                self.pondre("Concierge", 0.15)
 
                 self.faire_travailler()
 
