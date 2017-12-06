@@ -299,9 +299,13 @@ class Fourmilliere:
         """ Tourne le programme en boucle. """
         print(self)
         while True:
-            self.connexion()
-            self.boucle_chasse()
-            self.boucle_amelioration()
+            try:
+                self.connexion()
+                self.boucle_chasse()
+                self.boucle_amelioration()
+            except Exception as e:
+                print(e)
+                print("-"*30)
             dormir(60)
 
     def boucle_chasse(self):
@@ -311,7 +315,7 @@ class Fourmilliere:
         if not temps_restant:
             self.get_ressource()
             self.get_armee()
-            print(str(self) + " (" + str(self.nbr_boucle) + ")" )
+            print(str(self) )
         else:
             print(str(int(temps_restant/60)), end=" ")
 
@@ -352,7 +356,14 @@ class Fourmilliere:
         print("-", end=" ")
 
     def __str__(self):
-        text = "{0} nourriture, {1} materiaux, {2} ouvrieres, {3} tdc, {4} unités.".format(self.nourriture, self.bois, self.ouvrieres, self.tdc, self.armee_totale())
+        text = ""
+        text += "{0:,} nourriture; ".format(self.nourriture).replace(","," ")
+        text += "{0:,} materiaux; ".format(self.bois).replace(","," ")
+        text += "{0:,} ouvrières; ".format(self.ouvrieres).replace(","," ")
+        text += "{0:,} tdc; ".format(self.tdc).replace(","," ")
+        text += "{0:,} unités. ".format(self.armee_totale()).replace(","," ")
+        text += "({0:,})".format(self.nbr_boucle).replace(","," ")
+
         return text
 
 
