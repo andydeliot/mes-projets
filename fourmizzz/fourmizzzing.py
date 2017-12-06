@@ -112,9 +112,11 @@ class Fourmilliere:
             self.nourriture = int(self.browser.find(id="nb_nourriture").text.split(".")[0])
             self.bois = int(self.browser.find(id="nb_materiaux").text)
             self.tdc = int(self.browser.find(id="quantite_tdc").text)
-        except AttributeError:
+        except AttributeError as e:
             print("Erreur lors de la récupération des ressources.")
+            print(e)
             print(self.browser.url)
+            print("-"*30)
 
     def get_armee(self):
         self.page("Armée")
@@ -154,7 +156,10 @@ class Fourmilliere:
             link = self.browser.get_link(nom_page)
             if link is not None:
                 try: self.browser.follow_link(link)
-                except ConnectionError: erreur = True
+                except ConnectionError as e:
+                    print(e)
+                    print("-"*30)
+                    erreur = True
             alerte = self.browser.find("script", text="""alert("Vous venez de vous connecter avec un second navigateur ou quelqu'un vient de se connecter sur votre compte. Il est conseillé de vous reconnecter et de changer votre mot de passe.");""")
             if alerte is not None:
                 erreur = True
@@ -246,8 +251,10 @@ class Fourmilliere:
                 temps_unite = parser_temps(spans[0].text)
                 nourriture_unite = int(spans[1].text.replace(" ", ""))
                 break
-            except AttributeError:
+            except AttributeError as e:
                 print("Erreur lors du calcul du temps de ponte.")
+                print(e)
+                print("-"*30)
 
         temps_possible = self.temps_chasse * pourcent
         nombre = int(temps_possible / temps_unite)
@@ -260,8 +267,10 @@ class Fourmilliere:
             form["nombre_de_ponte"] = nombre
 
             self.browser.submit_form(form)
-        except AttributeError:
+        except AttributeError as e:
             print("Erreur lors de la ponte.")
+            print(e)
+            print("-"*30)
 
     def construire(self, batiment):
         """ Cherche à construire un batiment particulier. """
@@ -315,9 +324,9 @@ class Fourmilliere:
         if not temps_restant:
             self.get_ressource()
             self.get_armee()
-            print(str(self) )
+            print(self)
         else:
-            print(str(int(temps_restant/60)), end=" ")
+            print(str(int(temps_restant/60)))#, end=" ")
 
         # Début.
         if not temps_restant:
