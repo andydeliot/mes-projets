@@ -362,7 +362,7 @@ class Fourmilliere:
         self.rechercher("Vitesse de chasse")
         self.rechercher("Vitesse d'attaque")
 
-        print("-", end=" ")
+        print("-")#, end=" ")
 
     def __str__(self):
         text = ""
