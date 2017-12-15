@@ -167,6 +167,8 @@ class Fourmilliere:
                 break
             self.connexion()
 
+### Action ###
+
     def faire_travailler(self):
         """ Fais partager les travailleuses entre les deux ressources possibles. """
         self.page("Ressources")
@@ -193,8 +195,6 @@ class Fourmilliere:
         for unite in types_unite:
             cm2 += int(self.armee[unite] * 0.03)
         return cm2
-
-### Action ###
 
     def chasser(self, *types_unite):
         """ Permet de chasser proportionnelement à la taille de l'unité qui va chasser. """
@@ -312,6 +312,8 @@ class Fourmilliere:
                 self.connexion()
                 self.boucle_chasse()
                 self.boucle_amelioration()
+                self.production = 0
+                self.faire_travailler()
                 dormir(60*30)
             except Exception as e:
                 print(e)
@@ -331,7 +333,6 @@ class Fourmilliere:
 
         # Début.
         if not temps_restant:
-            self.production = 0
             if self.chasser("Jeune Soldate", "Artilleuse"):
                 # Rembourser et améliorer l'armée.
                 self.pondre("Jeune Soldate", 0.25)
@@ -340,8 +341,6 @@ class Fourmilliere:
                 self.pondre("Ouvriere", 0.3)
                 self.pondre("Jeune Soldate Naine", 0.05)
                 self.pondre("Concierge", 0.15)
-
-                self.faire_travailler()
 
                 self.nbr_boucle += 1
 
