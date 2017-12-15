@@ -181,10 +181,10 @@ class Fourmilliere:
         
         form = self.browser.get_form(action="Ressources.php")
         if form is not None:
-            print(form)
             form["RecolteNourriture"] = nourriture
             form["RecolteMateriaux"] = materiaux
             self.browser.submit_form(form)
+            print("Les ouvrières travaillent.")
         else:
             print("La mise au travail n'a pas fonctionné.")
 
