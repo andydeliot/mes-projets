@@ -11,6 +11,15 @@ from pygame import *
 from time import time
 from random import randint
 
+Game.minerais = []
+class Minerai(Objet):
+    def __init__(self, x, y):
+        Objet.__init__(self, x, y, couleur=(0, 255, 255), taille=0.5)
+        Game.minerais.append(self)
+
+    def supprimer(self):
+        Objet.supprimer(self)
+        Game.minerais.remove(self)
 
 
 def ia_ennemi(self):
@@ -18,6 +27,14 @@ def ia_ennemi(self):
 
 def ia_mega_ennemi(self):
     self.avancer_vers(perso2)
+
+def ia_ennemi_runner(self):
+    if self.distance_avec(perso2) < 10:
+        self.avancer_vers(perso2, 180)
+    else:
+        cible = self.objet_le_plus_proche(Game.minerais)
+        if cible != "":
+            self.avancer_vers(cible)
 
 # Objet.
 perso1 = Personnage(50, 10, taille=1.5, vitesse=12, nom="Runner (A)")
@@ -31,9 +48,10 @@ heros = [perso1, perso2]
 temps_minerai = time()
 temps_ennemi = time()
 temps_mega_ennemi = time()
+temps_ennemi_runner = time()
 
 # Score.
-minerai = 0
+score_minerai = 0
 ennemi_tue = 0
 
 # Texte.
@@ -43,8 +61,7 @@ while Game.jouer():
 
     # Chrono.
     if time() - temps_minerai > 3:
-        Objet(randint(0, int(Game.LARGEUR_ECRAN_METRE)), randint(0, int(Game.HAUTEUR_ECRAN_METRE)),
-              couleur=(0, 255, 255), taille=0.5)
+        Minerai(randint(0, int(Game.LARGEUR_ECRAN_METRE)), randint(0, int(Game.HAUTEUR_ECRAN_METRE)))
         temps_minerai = time()
 
     if time() - temps_ennemi > 5:
@@ -64,20 +81,30 @@ while Game.jouer():
                    couleur=(255, 0, 0), vitesse=2, taille=2, nom="MegaEnnemi", nom_ia=ia_mega_ennemi)
         temps_mega_ennemi = time()
 
+    if time() - temps_ennemi_runner > 45:
+        Personnage(randint(0, int(Game.LARGEUR_ECRAN_METRE)), randint(0, int(Game.HAUTEUR_ECRAN_METRE)),
+                   couleur=(255, 0, 0), vitesse=12, taille=1.5, nom="EnnemiRunner", nom_ia=ia_ennemi_runner)
+        temps_ennemi_runner = time()
+
     # Minerai.
-    for objet in list(Game.objets):
-        if objet.couleur == (0, 255, 255):
-            if perso1.collision_avec(objet):
-                objet.supprimer()
-                minerai += 1
+    for minerai in list(Game.minerais):
+        if perso1.collision_avec(minerai):
+            minerai.supprimer()
+            score_minerai += 1
+
+        for personnage in Game.personnages:
+            if personnage.nom == "EnnemiRunner":
+                if personnage.collision_avec(minerai):
+                    minerai.supprimer()
 
     # Collision ennemi.
     for personnage in list(Game.personnages):
         if personnage is not perso1 and personnage is not perso2:
             if perso1.collision_avec(personnage):
-                perso1.pv = 0
+                if personnage.nom in ["Ennemi", "MegaEnnemi"]:
+                    perso1.pv = 0
             if perso2.collision_avec(personnage):
-                if personnage.nom == "Ennemi":
+                if personnage.nom in ["Ennemi", "EnnemiRunner"]:
                     personnage.supprimer()
                     ennemi_tue += 1
                 else:
@@ -147,7 +174,7 @@ while Game.jouer():
                 n += 1
 
     # Texte.
-    texte_score.texte = "Minerai : {0}  Ennemi tué : {1}".format(minerai, ennemi_tue)
+    texte_score.texte = "Minerai : {0}  Ennemi tué : {1}".format(score_minerai, ennemi_tue)
 
 
 

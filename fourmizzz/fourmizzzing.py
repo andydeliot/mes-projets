@@ -312,10 +312,11 @@ class Fourmilliere:
                 self.connexion()
                 self.boucle_chasse()
                 self.boucle_amelioration()
+                dormir(60*30)
             except Exception as e:
                 print(e)
                 print("-"*30)
-            dormir(60*30)
+                dormir(60*2)
 
     def boucle_chasse(self):
         # Regarder combien de temps avant la prochaine chasse..
