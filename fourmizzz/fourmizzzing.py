@@ -94,7 +94,7 @@ class Fourmilliere:
                 break
             except:
                 print("Erreur de connexion")
-                dormir(1)
+                dormir(60*5)
                 pass
 
         form = self.browser.get_form(id="loginForm")
@@ -184,7 +184,6 @@ class Fourmilliere:
             form["RecolteNourriture"] = nourriture
             form["RecolteMateriaux"] = materiaux
             self.browser.submit_form(form)
-            print("Les ouvrières travaillent.")
         else:
             print("La mise au travail n'a pas fonctionné.")
 
@@ -235,8 +234,6 @@ class Fourmilliere:
 
     def pondre(self, type_unite, pourcent):
         """ Permet de faire pondre la reine. Le pourcent correspond au temps de chasse. """
-
-
         # Calcul temps.
         while True:
             try:
