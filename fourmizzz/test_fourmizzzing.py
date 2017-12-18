@@ -1,6 +1,7 @@
 import os
 import pytest
 from fourmizzzing import *
+from datetime import timedelta
 
 # Setup.
 
@@ -65,7 +66,18 @@ def test_faire_travailler(f):
     assert f.browser.url == "http://s4.fourmizzz.fr/Ressources.php"
 
 
+def test_parser_temps():
+    assert parser_temps("1s") == timedelta(seconds=1)
+    assert parser_temps("36s") == timedelta(seconds=36)
+    assert parser_temps("0.80s") == timedelta(microseconds=80000)
+    assert parser_temps("5.99s") == timedelta(seconds=5, microseconds=99000)
 
+    assert parser_temps("25m 51s") == timedelta(minutes=25, seconds=51)
+    assert parser_temps("59m") == timedelta(minutes=59)
+    assert parser_temps("14h 39m 10s") == timedelta(hours=14, minutes=39, seconds=10)
+    assert parser_temps("22h") == timedelta(hours=22)
+    assert parser_temps("3j 7h 47m 55s") == timedelta(days=3, hours=7, minutes=47, seconds=55)
+    assert parser_temps("15j") == timedelta(days=15)
 
 
 

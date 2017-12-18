@@ -6,23 +6,33 @@ from robobrowser import RoboBrowser
 
 def parser_temps(texte_temps):
     textes = texte_temps.split(" ")
+    microsecondes = 0
     secondes = 0
     minutes = 0
     heures = 0
+    jours = 0
     for texte in textes:
         if "s" in texte:
             texte = texte[:-1]
-            texte = texte.split(".")[0]
-            secondes = int(texte)
+            if "." in texte:
+                texte = texte.split(".")
+                secondes = texte[0]
+                secondes = int(secondes)
+                microsecondes = texte[-1]
+                microsecondes = int(microsecondes)*1000
+            else:
+                secondes = int(texte)
         if "m" in texte:
             texte = texte[:-1]
-            texte = texte.split(".")[0]
             minutes = int(texte)
         if "h" in texte or "H" in texte:
             texte = texte[:-1]
-            texte = texte.split(".")[0]
             heures = int(texte)
-    return timedelta(hours=heures, minutes=minutes, seconds=secondes)
+        if "j" in texte or "J" in texte:
+            texte = texte[:-1]
+            jours = int(texte)
+    return timedelta(days=jours, hours=heures, minutes=minutes,
+                     seconds=secondes, microseconds=microsecondes)
 
 def dormir(temps):
     if type(temps) is int:
@@ -264,6 +274,7 @@ class Fourmilliere:
             form["nombre_de_ponte"] = nombre
 
             self.browser.submit_form(form)
+            print("Ponte de {0} {1}".format(str(nombre), str(type_unite)))
         except AttributeError as e:
             print("Erreur lors de la ponte.")
             print(e)
