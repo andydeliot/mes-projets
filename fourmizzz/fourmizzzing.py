@@ -342,15 +342,15 @@ class Fourmilliere:
         # Début.
         if not temps_restant:
             if self.chasser("Jeune Soldate", "Artilleuse"):
+                self.nbr_boucle += 1
                 # Rembourser et améliorer l'armée.
-                self.pondre("Jeune Soldate", 0.25)
-                self.pondre("Artilleuse", 0.25)
+                self.pondre("Jeune Soldate", 0.3)
+                self.pondre("Artilleuse", 0.3)
                 # Améliorer la colonie et défendre.
                 self.pondre("Ouvriere", 0.3)
                 self.pondre("Jeune Soldate Naine", 0.05)
-                self.pondre("Concierge", 0.15)
+                self.pondre("Concierge", 0.05)
 
-                self.nbr_boucle += 1
 
     def boucle_amelioration(self):
         self.construire("Champignonnière")
