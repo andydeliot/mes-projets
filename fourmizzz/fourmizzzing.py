@@ -251,8 +251,7 @@ class Fourmilliere:
 
                 self.page("Reine")
 
-                type_unite = Fourmilliere.equivalent[type_unite]
-                input_unite = self.browser.find("input", {"value":type_unite})
+                input_unite = self.browser.find("input", {"value":Fourmilliere.equivalent[type_unite]})
                 tr = input_unite.parent.parent
                 spans = tr.findAll("span", {"style":"height:20px;width:85px;display:inline-block;"})
                 temps_unite = parser_temps(spans[0].text)
@@ -270,7 +269,7 @@ class Fourmilliere:
 
         try:
             form = self.browser.get_form(action="Reine.php")
-            form["typeUnite"] = type_unite
+            form["typeUnite"] = Fourmilliere.equivalent[type_unite]
             form["nombre_de_ponte"] = nombre
 
             self.browser.submit_form(form)
