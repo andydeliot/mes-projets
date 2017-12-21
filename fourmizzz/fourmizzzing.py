@@ -199,10 +199,16 @@ class Fourmilliere:
 
     def cm2_chassable(self, *types_unite):
         """ Retourne le nombre de cm2 conquerable selon les unités donnée. """
+        """ Je ne sais pas pourquoi, mais ça ne fonctionne pas avec toutes les types de fourmis.
+            je pense que ça viens de l'encodage puisque ça bug avec Soldate d'élite. """
         self.get_armee()
-        cm2 = 0
+        self.get_ressource()
+        nbr_unite = 0
         for unite in types_unite:
-            cm2 += int(self.armee[unite] * 0.03)
+            nbr_unite += int(self.armee[unite])
+        cm2 = 0
+        if nbr_unite > 10000:
+            cm2 = nbr_unite * 0.05
         return cm2
 
     def chasser(self, *types_unite):
