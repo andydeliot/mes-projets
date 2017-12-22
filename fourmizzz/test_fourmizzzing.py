@@ -69,8 +69,9 @@ def test_faire_travailler(f):
 def test_parser_temps():
     assert parser_temps("1s") == timedelta(seconds=1)
     assert parser_temps("36s") == timedelta(seconds=36)
-    assert parser_temps("0.80s") == timedelta(microseconds=80000)
-    assert parser_temps("5.99s") == timedelta(seconds=5, microseconds=99000)
+    assert parser_temps("0.80s") == timedelta(seconds=0.8)
+    assert parser_temps("1.72s") == timedelta(seconds=1.72)
+    assert parser_temps("5.99s") == timedelta(seconds=5.99)
 
     assert parser_temps("25m 51s") == timedelta(minutes=25, seconds=51)
     assert parser_temps("59m") == timedelta(minutes=59)

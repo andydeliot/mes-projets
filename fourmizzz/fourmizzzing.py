@@ -6,7 +6,6 @@ from robobrowser import RoboBrowser
 
 def parser_temps(texte_temps):
     textes = texte_temps.split(" ")
-    microsecondes = 0
     secondes = 0
     minutes = 0
     heures = 0
@@ -14,14 +13,7 @@ def parser_temps(texte_temps):
     for texte in textes:
         if "s" in texte:
             texte = texte[:-1]
-            if "." in texte:
-                texte = texte.split(".")
-                secondes = texte[0]
-                secondes = int(secondes)
-                microsecondes = texte[-1]
-                microsecondes = int(microsecondes)*1000
-            else:
-                secondes = int(texte)
+            secondes = float(texte)
         if "m" in texte:
             texte = texte[:-1]
             minutes = int(texte)
@@ -32,7 +24,7 @@ def parser_temps(texte_temps):
             texte = texte[:-1]
             jours = int(texte)
     return timedelta(days=jours, hours=heures, minutes=minutes,
-                     seconds=secondes, microseconds=microsecondes)
+                     seconds=secondes)
 
 def dormir(temps):
     if type(temps) is int:
@@ -346,11 +338,11 @@ class Fourmilliere:
 
         # Début.
         if not temps_restant:
-            if self.chasser("Jeune Soldate", "Artilleuse"):
+            if self.chasser("Jeune Soldate", "Soldate", "Artilleuse"):
                 self.nbr_boucle += 1
                 # Rembourser et améliorer l'armée.
-                self.pondre("Jeune Soldate", 0.3)
-                self.pondre("Artilleuse", 0.3)
+                self.pondre("Jeune Soldate", 0.4)
+                self.pondre("Artilleuse", 0.2)
                 # Améliorer la colonie et défendre.
                 self.pondre("Ouvriere", 0.3)
                 self.pondre("Jeune Soldate Naine", 0.05)
