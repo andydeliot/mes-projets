@@ -319,11 +319,11 @@ class Fourmilliere:
                 self.boucle_amelioration()
                 self.production = 0
                 self.faire_travailler()
-                dormir(60*30)
+                dormir(3600)
             except Exception as e:
                 print(e)
                 print("-"*30)
-                dormir(60*2)
+                dormir(120)
 
     def boucle_chasse(self):
         # Regarder combien de temps avant la prochaine chasse..
@@ -350,22 +350,23 @@ class Fourmilliere:
 
 
     def boucle_amelioration(self):
-        self.construire("Champignonnière")
-        self.construire("Entrepôt de Nourriture")
-        self.construire("Entrepôt de Matériaux")
         self.construire("Couveuse")
         self.construire("Solarium")
         self.construire("Laboratoire")
         self.construire("Salle d'analyse")
         self.construire("Etable à cochenilles")
+        self.construire("Entrepôt de Matériaux")
+        self.construire("Entrepôt de Nourriture")
+        self.construire("Champignonnière")
+
 
         self.rechercher("Technique de ponte")
+        self.rechercher("Vitesse de chasse")
+        self.rechercher("Architecture")
         self.rechercher("Bouclier Thoracique")
         self.rechercher("Armes")
-        self.rechercher("Architecture")
-        self.rechercher("Communication avec les animaux")
-        self.rechercher("Vitesse de chasse")
         self.rechercher("Vitesse d'attaque")
+        self.rechercher("Communication avec les animaux")
 
         print("-")#, end=" ")
 
