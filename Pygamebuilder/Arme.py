@@ -13,13 +13,15 @@ from math import pi
 
 class Arme:
     """ Objet transporté par les personnages. Tir des projectiles."""
-    def __init__(self, personnage, frequence_utilisation=0.3, munitions_max=-1):
+    def __init__(self, personnage, frequence_utilisation=0.3, munitions_max=-1, projectile=Projectile):
         self.personnage = personnage  # Le soldat a qui appartient l'arme.
 
         self.frequence_utilisation = frequence_utilisation
         self.temps_derniere_utilisation = self.frequence_utilisation
         self.munitions_max = munitions_max
         self.munitions = self.munitions_max
+
+        self.projectile = projectile # Classe.
 
     def utilisable(self):
         """ Observe si l'arme est utilisable.
@@ -29,7 +31,7 @@ class Arme:
     def utiliser(self):
         """ Fonction à implémenter dans les sous classes. """
         if self.utilisable():
-            Projectile(self.personnage)
+            self.projectile(self.personnage)
             self.temps_derniere_utilisation = 0
             self.munitions -= 1
 

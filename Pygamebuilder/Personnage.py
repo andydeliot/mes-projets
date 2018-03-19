@@ -86,8 +86,8 @@ class Personnage(Objet):
             self.dessiner_barre(1, 50, self.pv, self.pv_max, (0, 255, 0))
             self.dessiner_barre(1.5, 50, self.pv, self.pv_max, (0, 255, 0))
 
-            self.dessiner_barre(3, 50, self.arme_primaire.munitions, 10, (200, 200, 200))
-            self.dessiner_barre(3.5, 50, self.arme_primaire.munitions, 10, (200, 200, 200))
+            self.dessiner_barre(3, 50, self.arme_primaire.munitions, self.arme_primaire.munitions_max, (200, 200, 200))
+            self.dessiner_barre(3.5, 50, self.arme_primaire.munitions, self.arme_primaire.munitions_max, (200, 200, 200))
         else:
             self.dessiner_cercle(self, self.taille, self.couleur)
 
