@@ -14,35 +14,29 @@ db = Database()
 
 
 class Langue(db.Entity):
-    langue = Required(str, unique=True)  # Langue écrite dans sa langue.
+    langue = Required(str, unique=True)  # Ecrit dans sa langue.
 
-    mots = Set(lambda: Mot)
-
-
-class Mot(db.Entity):
-
-    langue = Required(lambda: Langue)
-    sens = Required(lambda: Sens)
     ecritures = Set(lambda: Ecriture)
-    prononciations = Set(lambda: Prononciation)
 
 
 class Sens(db.Entity):
     sens = Required(str, unique=True) # Description en français. (évolutif)
 
-    mots = Set(lambda: Mot)
+    ecritures = Set(lambda: Ecriture)
 
 
 class Ecriture(db.Entity):
     ecriture = Required(str)
 
-    mot = Required(lambda: Mot)
+    langue = Required(lambda: Langue)
+    sens = Required(lambda: Sens)
+    prononciations = Set(lambda: Prononciation)
 
 
 class Prononciation(db.Entity):
     prononciation = Required(str)
 
-    mot = Required("Mot")
+    ecriture = Required(lambda: Ecriture)
 
 
 db.bind(provider='sqlite', filename='database.sqlite', create_db=True)
@@ -57,8 +51,7 @@ def ajouter_mot(le_sens, *ecritures):
     sens = Sens(sens=le_sens)
     for i in range(len(ecritures)):
         langue = Langue[i+1]
-        mot = Mot(langue=langue, sens=sens)
-        Ecriture(ecriture=ecritures[i], mot=mot)
+        Ecriture(ecriture=ecritures[i], langue=langue, sens=sens)
 
 @db_session
 def creation():
@@ -81,13 +74,13 @@ def affichage():
     print()
     select(s for s in Sens).show()
     print()
-    select(m for m in Mot).show()
+    select(e for e in Ecriture).show()
     print()
 
     print("#"*80)
     print("#"*35 + " Exercice " + "#"*35)
     print("#"*80)
-    select(e.mot.ecritures for e in Ecriture if "B" in e.ecriture).show()
+    select(e.ecriture for e in Ecriture if "B" in e.ecriture).show()
 
 creation()
 affichage()
