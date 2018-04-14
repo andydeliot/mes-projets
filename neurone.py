@@ -18,38 +18,45 @@ class Lien:
     def correction_valeur(self):
         self.valeur = self.valeur + (self.apprentissage * self.entree.valeur * self.sortie.delta)
 
+    def __repr__(self):
+        return "{0}({1}) -- {2} -- {3}({4})".format(self.entree.__class__.__name__,
+                                                  id(self.entree),
+                                                  self.valeur,
+                                                  self.sortie.__class__.__name__,
+                                                  id(self.sortie))
+
 
 class Perceptron:
-    def __init__(self, updateur=lambda:0):
+    def __init__(self, updateur=lambda x,**kwargs:0):
         self.updateur = updateur
         self.valeur = 0
 
         self.sorties = []
         
-    def update(self):
-        self.valeur = self.updateur()
+    def update(self, **kwargs):
+        self.valeur = self.updateur(self, **kwargs)
 
 
 class Sortie:
-    def __init__(self, procedure=lambda x:print(x)):
+    def __init__(self, procedure=lambda x,**kwargs:print(x.valeur)):
         self.procedure = procedure
         self.valeur = 0
         self.delta = 0
 
         self.entrees = []
 
-    def update(self):
+    def update(self, **kwargs):
         x = sum([l.entree.valeur * l.valeur for l in self.entrees])
         x = -100 if x < -100 else x
         x = 100 if x > 100 else x
         self.valeur = 1. / (1. + math.exp(-x))
         # La valeur est comprise entre 0 et 1. Si x = 0, y = 0.5.
 
-        self.procedure(self.valeur)
+        self.procedure(self, **kwargs)
 
     def valeur_delta(self, valeur_souhaite):
         """ Fonction utile à la rétro propagation :
-            Indiquer la valeur qu'aurait du obtenir la sortie.
+            Indiquer la valeur qu'aurait dû obtenir la sortie.
             En théorie, la valeur devrait être entre 0 et 1. """
         self.delta = valeur_souhaite - self.valeur
 
@@ -73,7 +80,6 @@ class Neurone:
         self.delta = self.valeur * (1 - self.valeur) * somme_sortie 
 
 
-
 class Reseaux:
     def __init__(self, entrees, sorties, nbr_couches, longueur_couche):
         self.entrees = entrees
@@ -82,29 +88,32 @@ class Reseaux:
         self.couches = []
         for _ in range(nbr_couches):
             couche = []
-            for l in range(longueur_couche):
+            for _ in range(longueur_couche):
                 couche.append(Neurone())
             self.couches.append(couche)
         # Liaisons des couches.
         for num_couche in range(len(self.couches)):
             couche_entree = self.entrees if not num_couche else self.couches[num_couche-1]
-            couche_sortie = self.sorties if len(self.couches) - num_couche else self.couches[num_couche+1]
             for neurone in self.couches[num_couche]:
                 for neurone_entree in couche_entree:
                     Lien(neurone_entree, neurone)
-                for neurone_sortie in couche_sortie:
-                    Lien(neurone, neurone_sortie)
+        for s in self.sorties:
+            for neurone_entree in self.couches[-1]:
+                Lien(neurone_entree, s)
 
-    def update(self):
+    def update(self, **kwargs):
         for e in self.entrees:
-            e.update()
+            e.update(**kwargs)
         for couche in self.couches:
             for n in couche:
                 n.update()
         for s in self.sorties:
-            s.update()
+            s.update(**kwargs)
 
     def retropropagation(self):
+        for e in self.entrees:
+            for l in e.sorties:
+                l.correction_valeur()
         self.couches.reverse()
         for couche in self.couches:
             for n in couche:
@@ -113,9 +122,6 @@ class Reseaux:
             for n in couche:
                 for l in n.sorties:
                     l.correction_valeur()
-        for e in self.entrees:
-            for l in e.sorties:
-                l.correction_valeur()
         self.couches.reverse()
 
 
