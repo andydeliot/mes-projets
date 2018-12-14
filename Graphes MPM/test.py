@@ -198,6 +198,20 @@ def test_volume_graphe(A, B, C, D, E, F, Gphe):
 
 
 
+def test_dot_tache(A):
+    assert A.dot() == '"Une nouvelle tâche"'
+
+
+def test_dot_tache_avec_successeur(A, B, C):
+    assert A.dot() == '"Une nouvelle tâche" -> "Une deuxième tâche", "Une troisième tâche"'
+
+def test_dot_graphe(A):
+    Gphe = Graphe(A)
+    print(Gphe.dot())
+    assert Gphe.dot() == """digraph Gphe {
+\t"Début" -> "Une nouvelle tâche";
+\t"Une nouvelle tâche" -> "Fin";
+}"""
 
 
 
@@ -211,5 +225,5 @@ def test_volume_graphe(A, B, C, D, E, F, Gphe):
 
 if __name__ == "__main__":
     nom_script = sys.argv[0].split("/")[-1]
-    msg = os.popen("pytest " + nom_script)# + " -vv")
+    msg = os.popen("pytest-3 " + nom_script)# + " -vv")
     print(msg.read())

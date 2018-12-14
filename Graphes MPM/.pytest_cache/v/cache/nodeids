@@ -1,0 +1,21 @@
+[
+  "test.py::test_nouvelle_tache",
+  "test.py::test_tache_avec_predecesseurs",
+  "test.py::test_tache_deux_predecesseurs",
+  "test.py::test_successeurs",
+  "test.py::test_recherche_predecesseur",
+  "test.py::test_recherche_successeur",
+  "test.py::test_anti_transitivite_simple",
+  "test.py::test_date_au_plus_tot",
+  "test.py::test_date_au_plus_tard",
+  "test.py::test_affichage_tableau",
+  "test.py::test_graphe",
+  "test.py::test_affichage_tableau_graphe",
+  "test.py::test_chemin_critique",
+  "test.py::test_listage_predecesseur",
+  "test.py::test_volume_tache",
+  "test.py::test_volume_graphe",
+  "test.py::test_dot_tache",
+  "test.py::test_dot_tache_avec_successeur",
+  "test.py::test_dot_graphe"
+]

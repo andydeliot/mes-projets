@@ -96,6 +96,14 @@ class Tache:
     def affichage_tableau(self):
         return self.nom + " (" + str(self.duree) + ") " + str(self.date_plus_tot) + "/" + str(self.date_plus_tard)
 
+    def dot(self):
+        texte = '"{}"'.format(self.nom)
+        if len(self.successeurs):
+            texte += " -> "
+        successeurs = ['"{}"'.format(successeur.nom) for successeur in self.successeurs]
+        texte += ", ".join(successeurs)
+        return texte
+
     def __str__(self):
         p = [str(t.nom) for t in self.predecesseurs]
         p = ", ".join(p)
@@ -107,7 +115,7 @@ class Tache:
 
 class Graphe:
     def __init__(self, *taches):
-        self.debut = Tache("Debut", 0)
+        self.debut = Tache("Début", 0)
         self.fin = Tache("Fin", 0)
         self.taches = list(taches)
         # Relier début et fin.
@@ -136,6 +144,14 @@ class Graphe:
             textes.append(t.affichage_tableau())
         textes.append(self.fin.affichage_tableau())
         return "\n".join(textes)
+
+    def dot(self):
+        texte = """digraph Gphe {\n"""
+        texte += "\t" + self.debut.dot() + ";\n"
+        for tache in self.taches:
+            texte += "\t" + tache.dot() + ";\n"
+        texte += "}"
+        return texte
 
 
 
