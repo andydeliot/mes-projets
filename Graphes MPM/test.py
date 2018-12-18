@@ -196,22 +196,89 @@ def test_volume_graphe(A, B, C, D, E, F, Gphe):
     assert Gphe.volume() == Gphe.fin.volume()
     assert Gphe.volume() == 21
 
-
+##def test_calcul_marge():
+##    A = Tache("", 5)
+##    A.date_plus_tot = 0
+##    A.date_plus_tard = 5
+##    assert A.calcul_marge() == 0
+##    A.date_plus_tard = 10
+##    assert A.calcul_marge() == 5
+##    A.date_plus_tard = 3
+##    assert A.calcul_marge() == 2
 
 def test_dot_tache(A):
-    assert A.dot() == '"Une nouvelle tâche"'
+    assert A.dot() == """\t"Une nouvelle tâche" [color=red, style=filled];
+\t"Une nouvelle tâche";
+"""
 
 
 def test_dot_tache_avec_successeur(A, B, C):
-    assert A.dot() == '"Une nouvelle tâche" -> "Une deuxième tâche", "Une troisième tâche"'
+    assert A.dot() == """\t"Une nouvelle tâche" [color=red, style=filled];
+\t"Une nouvelle tâche" -> "Une deuxième tâche", "Une troisième tâche";
+"""
+    B.date_plus_tot = 1
+    B.date_plus_tard = 2
+    assert B.dot() == """\t"Une deuxième tâche";
+\t"Une deuxième tâche";
+"""
+    C.date_plus_tot = 1
+    C.date_plus_tard = 1
+    assert C.dot() == """\t"Une troisième tâche" [color=red, style=filled];
+\t"Une troisième tâche";
+"""
+
 
 def test_dot_graphe(A):
     Gphe = Graphe(A)
-    print(Gphe.dot())
     assert Gphe.dot() == """digraph Gphe {
+\t"Début" [color=red, style=filled];
 \t"Début" -> "Une nouvelle tâche";
+\t"Une nouvelle tâche" [color=red, style=filled];
 \t"Une nouvelle tâche" -> "Fin";
+\t"Fin" [color=red, style=filled];
 }"""
+
+
+def test_generation_html_tache(A, B, C):
+    assert A.generation_html() == """<tr><td>Une nouvelle tâche</td><td bgcolor="#FF5733"></tr>\n"""
+    assert B.generation_html() == """<tr><td>Une deuxième tâche</td><td bgcolor="#FF5733"><td bgcolor="#FF5733"></tr>\n"""
+    assert C.generation_html() == """<tr><td>Une troisième tâche</td><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#FF5733"></tr>\n"""
+
+
+
+def test_generation_html_graphe(A, B, C):
+    Gphe = Graphe(A, B, C)
+    print(Gphe.generation_html())
+    assert Gphe.generation_html() == """<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<table border=5>
+<tr><th>Nom de l'étape</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
+<tr><td>Une nouvelle tâche</td><td bgcolor="#FF5733"><td><td><td></tr>
+<tr><td>Une deuxième tâche</td><td><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#3375FF"></tr>
+<tr><td>Une troisième tâche</td><td><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#FF5733"></tr>
+</table>
+"""
+
+def test_generation_html_graphe2(A, B, C, D):
+    Gphe = Graphe(A, B, C, D)
+    print(Gphe.generation_html())
+    assert Gphe.generation_html() == """<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<table border=5>
+<tr><th>Nom de l'étape</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+<tr><td>Une nouvelle tâche</td><td bgcolor="#FF5733"><td><td><td><td><td><td><td></tr>
+<tr><td>Une deuxième tâche</td><td><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#3375FF"><td><td><td><td></tr>
+<tr><td>Une troisième tâche</td><td><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td><td><td><td></tr>
+<tr><td>Une quatrième tâche</td><td><td><td><td><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#FF5733"><td bgcolor="#FF5733"></tr>
+</table>
+"""
+
+
+
+
+
+
+
+
+
 
 
 
@@ -225,5 +292,5 @@ def test_dot_graphe(A):
 
 if __name__ == "__main__":
     nom_script = sys.argv[0].split("/")[-1]
-    msg = os.popen("pytest-3 " + nom_script)# + " -vv")
+    msg = os.popen("pytest-3 " + nom_script + " -vv")
     print(msg.read())

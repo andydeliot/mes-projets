@@ -117,9 +117,9 @@ Retour_joueur = Tache("Pouvoir obtenir le retour des joueurs apres une partie", 
 # Deployement.
 Plateforme = Tache("Observer si le jeu fonctionne sur les différentes plateforme concernées", 5, Jeu_IA, Matchmaking, Retour_joueur, Calcul_niveau_joueur, Bruitage, Statistique_partie, Interface_statistique, Equipe_predetermine, Tchat_interface_connexion)
 Photo = Tache("Prendre des photos pour la promotion du jeu", 1, Victoire_defaite)
-Site_web = Tache("Créer un site web pouvant héberger le jeu", 10, Plateforme)
+Site_web = Tache("Créer un site web pouvant héberger le jeu", 10, Photo)
 Forum = Tache("Créer un forum de discution sur le site internet", 4, Site_web)
-Publicite = Tache("Envoyer des publicités pour inviter les joueurs à tester le jeu", 6, Forum, Photo)
+Publicite = Tache("Envoyer des publicités pour inviter les joueurs à tester le jeu", 6, Forum, Plateforme)
 
 
 
@@ -138,13 +138,21 @@ if __name__ == "__main__":
     print(Gphe.volume())
     print("-"*10)
 
-    fichier = open("data.dot", "w")
-    fichier.write(Gphe.dot())
+
+    fichier = open("tableau.html", "w")
+    fichier.write(Gphe.generation_html())
     fichier.close()
 
-    msg = os.popen("dot -Tpng data.dot -o graphe.png")# + " -vv")
-    print(msg.read())
-    
+
+
+
+##    fichier = open("data.dot", "w")
+##    fichier.write(Gphe.dot())
+##    fichier.close()
+##
+##    msg = os.popen("dot -Tpng data.dot -o graphe.png")# + " -vv")
+##    print(msg.read())
+##    
 
 ##    print("Chemin critique : ")
 ##    for t in Gphe.chemin_critique:

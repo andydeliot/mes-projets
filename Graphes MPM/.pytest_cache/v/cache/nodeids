@@ -17,5 +17,8 @@
   "test.py::test_volume_graphe",
   "test.py::test_dot_tache",
   "test.py::test_dot_tache_avec_successeur",
-  "test.py::test_dot_graphe"
+  "test.py::test_dot_graphe",
+  "test.py::test_generation_html_tache",
+  "test.py::test_generation_html_graphe",
+  "test.py::test_generation_html_graphe2"
 ]
